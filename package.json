@@ -1,0 +1,36 @@
+{
+  "name": "marmalade-ng-explorer",
+  "private": true,
+  "version": "0.5.0",
+  "type": "module",
+  "scripts": {
+    "genversion": "genversion --es6 src/version.js",
+    "dev": "genversion --es6 src/version.js; vite",
+    "build": "genversion --es6 src/version.js; vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@kadena/client": "^1.4.0",
+    "decimal.js": "^10.4.3",
+    "genversion": "^3.1.1",
+    "promise-deferred": "^2.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-json-view-lite": "^1.0.0",
+    "react-router-dom": "^6.16.0",
+    "semantic-ui-css": "^2.5.0",
+    "semantic-ui-react": "^2.1.4",
+    "swr": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "vite": "^4.4.5"
+  }
+}
