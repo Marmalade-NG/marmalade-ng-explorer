@@ -129,6 +129,9 @@ class MarmaladeNGClient
                  "/extra_blacklist":
                     {cmd: id=> `(${this.policy_extra_policies}.get-blacklist "${id}")`,
                      post: x => ({blacklist:x.map(to_module)})},
+                 "/custodians":
+                    {cmd: id=> `(${this.policy_trusted_custody}.get-custodians-list "${id}")`,
+                     post: x => x},
                  "/marketplace":
                     {cmd: id => `(try {} (${this.policy_marketplace}.get-marketplace-fee "${id}"))`,
                      post:(x) => Object.keys(x).length?to_marketplace(x):null},
@@ -238,6 +241,11 @@ class MarmaladeNGClient
    get policy_marketplace()
    {
      return `${this.#namespace}.policy-marketplace`;
+   }
+
+   get policy_trusted_custody()
+   {
+     return `${this.#namespace}.policy-trusted-custody`;
    }
 
    get std_polices()

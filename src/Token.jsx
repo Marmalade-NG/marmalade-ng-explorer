@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {useSales, useFixedIssuance, useRoyalty, useGuards, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
+import {useSales, useFixedIssuance, useRoyalty, useGuards, useCustodians, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {useNFTdata} from "./NFT_data.js"
 import {AccountRef,CopyAccountRef, CopyHeader, CopyLink, TransactionLink} from './Common.jsx'
 import {SaleModal} from './SaleModal.jsx'
@@ -173,6 +173,14 @@ function GuardsPolicy({token_id})
           </>
 }
 
+function TrustedCustodyPolicy({token_id})
+{
+  const {custodians} = useCustodians(token_id);
+  return  <>
+          {custodians && (<JsonView data={custodians} shouldExpandNode={COLLAPSED} style={defaultStyles} />) }
+          </>
+}
+
 function ExtraPoliciesPolicy({token_id})
 {
   const {extra_blacklist} = useTokenExtraBlacklist(token_id);
@@ -264,6 +272,9 @@ function PoliciesGrid({token_id})
                   </PolicySegment>
                   <PolicySegment name="Disable burn" enabled={policies.includes("DISABLE-BURN")} />
                   <PolicySegment name="Disable transfer" enabled={policies.includes("DISABLE-TRANSFER")} />
+                  <PolicySegment name="Trusted Custody" enabled={policies.includes("TRUSTED-CUSTODY")}>
+                    <TrustedCustodyPolicy token_id={token_id} />
+                  </PolicySegment>
                 </Segment.Group>
               </Grid.Column>
 

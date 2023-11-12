@@ -53,6 +53,14 @@ export function useTokenExtraBlacklist(token_id)
   return {extra_blacklist:data??[], error}
 }
 
+export function useCustodians(token_id)
+{
+  const {data, error} = useSWR(token_id?["/custodians", token_id]:null, x => {return m_client.batch(x)})
+  if(error)
+    console.warn(error);
+  return {custodians:data??[], error}
+}
+
 export function useTokenCollection(token_id)
 {
   const {data, error} = useSWRImmutable(token_id?["/tokenCollection", token_id]:null, x => {return m_client.batch(x)})
