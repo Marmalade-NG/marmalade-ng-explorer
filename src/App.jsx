@@ -4,6 +4,8 @@ import {version} from './version.js';
 import { Routes, Route, useParams } from 'react-router-dom';
 import {Account} from './Account.jsx';
 import {Collection} from './Collections.jsx';
+import {InfoModal} from "./InfoModal.jsx"
+import {SettingsModal} from "./SettingsModal.jsx"
 import {CollectionsList} from './CollectionsLists.jsx';
 import {Sales} from './Sales.jsx';
 import {TokenView} from './Token.jsx';
@@ -12,7 +14,7 @@ import MARM_LOGO from './assets/marm_logo.png'
 
 
 import 'semantic-ui-css/semantic.min.css'
-import {Container, Dropdown, Form, Input, Image, Menu} from 'semantic-ui-react'
+import {Container, Dropdown, Form, Input, Image, Menu, Icon} from 'semantic-ui-react'
 
 
 function SearchField()
@@ -39,6 +41,10 @@ const ExplorerMenu = () => (
         <Image size='mini' src={MARM_LOGO} style={{ marginRight: '1.5em' }} />
         Marmalade-NG Explorer
       </Menu.Item>
+
+      <InfoModal trigger={<Menu.Item as="a"> <Icon name="info"/> </Menu.Item> }/>
+      <SettingsModal trigger={<Menu.Item as="a"> <Icon name="settings"/> </Menu.Item> }/>
+
       <Menu.Item as={Link} to='/collections' >Collections</Menu.Item>
 
       <Dropdown item button text='Sales'>
@@ -53,7 +59,7 @@ const ExplorerMenu = () => (
     </Menu.Item>
 
     <Menu.Item>
-    {`v${version}`} /  {m_client.network_refs}
+    {`v${version}`} /  {m_client.network_refs.substring(0,32)+"..."}
     </Menu.Item>
 
   </Menu>

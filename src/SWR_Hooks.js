@@ -2,6 +2,15 @@ import {m_client} from "./chainweb_marmalade_ng"
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable'
 
+export function useModuleHashes(enabled)
+{
+    const {data, error} = useSWR(enabled?"/mod_hashes":null, () => {return m_client.get_modules_hashes()},
+                                 {refreshInterval: 60*1000, revalidateIfStale:false})
+    if(error)
+      console.warn(error);
+    return {hashes:data, error}
+}
+
 export function useTokenUri(token_id)
 {
   const {data, error} = useSWRImmutable(token_id?["/uri", token_id]:null, x => {return m_client.batch(x)})

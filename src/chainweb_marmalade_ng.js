@@ -66,9 +66,31 @@ const to_marketplace = ({"marketplace-fee":fee, ...rest}) => ({"marketplace-fee"
 
 const LOCAL_GAS_LIMIT = 150000
 
+const MARMALADE_NG_POLICIES = ["adjustable-royalty",
+                               "auction-sale",
+                               "blacklist",
+                               "collection",
+                               "dutch-auction-sale",
+                               "disable-burn",
+                               "disable-sale",
+                               "disable-transfer",
+                               "extra-policies",
+                               "fixed-issuance",
+                               "fixed-sale",
+                               "guards",
+                               "instant-mint",
+                               "marketplace",
+                               "non-fungible",
+                               "royalty",
+                               "trusted-custody"]
+
+const MARMALADE_NG_CORE_MODS = ["ledger", "std-policies", "util-policies"]
+
+
 class MarmaladeNGClient
 {
   #client;
+  #node;
   #network;
   #chain;
   #namespace;
@@ -81,11 +103,18 @@ class MarmaladeNGClient
   constructor(node, network, chain, namespace)
   {
     this.#network = network
+    this.#node = node
     this.#chain = chain
     this.#client = createClient(`${node}/chainweb/0.0/${network}/chain/${chain}/pact`);
     this.#namespace = namespace;
     this.init()
   }
+
+  get settings()
+  {
+    return {node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace}
+  }
+
 
   init()
   {
@@ -188,71 +217,26 @@ class MarmaladeNGClient
      return `${this.#network} / ${this.#chain} / ${this.#namespace}`;
    }
 
-   get ledger()
+   to_namespace(x) {return `${this.#namespace}.${x}`;}
+
+   get mods()
    {
-     return `${this.#namespace}.ledger`;
+     return MARMALADE_NG_CORE_MODS.concat( MARMALADE_NG_POLICIES.map( x => "policy-"+x))
    }
 
-   get policy_collection()
-   {
-     return `${this.#namespace}.policy-collection`;
-   }
-
-   get policy_guards()
-   {
-     return `${this.#namespace}.policy-guards`;
-   }
-
-   get policy_fixed_sale()
-   {
-     return `${this.#namespace}.policy-fixed-sale`;
-   }
-
-   get policy_auction_sale()
-   {
-     return `${this.#namespace}.policy-auction-sale`;
-   }
-
-   get policy_dutch_auction_sale()
-   {
-     return `${this.#namespace}.policy-dutch-auction-sale`;
-   }
-
-   get policy_fixed_issuance()
-   {
-     return `${this.#namespace}.policy-fixed-issuance`;
-   }
-
-   get policy_extra_policies()
-   {
-     return `${this.#namespace}.policy-extra-policies`;
-   }
-
-   get policy_royalty()
-   {
-     return `${this.#namespace}.policy-royalty`;
-   }
-
-   get policy_adjustable_royalty()
-   {
-     return `${this.#namespace}.policy-adjustable-royalty`;
-   }
-
-   get policy_marketplace()
-   {
-     return `${this.#namespace}.policy-marketplace`;
-   }
-
-   get policy_trusted_custody()
-   {
-     return `${this.#namespace}.policy-trusted-custody`;
-   }
-
-   get std_polices()
-   {
-     return `${this.#namespace}.std-policies`;
-   }
-
+   get ledger()                    {return this.to_namespace("ledger");}
+   get policy_collection()         {return this.to_namespace("policy-collection");}
+   get policy_guards()             {return this.to_namespace("policy-guards"); }
+   get policy_fixed_sale()         {return this.to_namespace("policy-fixed-sale");}
+   get policy_auction_sale()       {return this.to_namespace("policy-auction-sale");}
+   get policy_dutch_auction_sale() {return this.to_namespace("policy-dutch-auction-sale");}
+   get policy_fixed_issuance()     {return this.to_namespace("policy-fixed-issuance");}
+   get policy_extra_policies()     {return this.to_namespace("policy-extra-policies");}
+   get policy_royalty()            {return this.to_namespace("policy-royalty");}
+   get policy_adjustable_royalty() {return this.to_namespace("policy-adjustable-royalty");}
+   get policy_marketplace()        {return this.to_namespace("policy-marketplace");}
+   get policy_trusted_custody()    {return this.to_namespace("policy-trusted-custody");}
+   get std_polices()               {return this.to_namespace("std-policies");}
 
   local_check(cmd, options)
   {
@@ -310,11 +294,21 @@ class MarmaladeNGClient
   {
       return this.local_pact(`(${this.policy_collection}.get-all-collections)`)
   }
+
+  get_modules_hashes()
+  {
+    return this.local_pact(`(map (lambda (x) [x, (at 'hash (describe-module (+ "${this.to_namespace("")}" x)))]) ${JSON.stringify(this.mods)})`)
+  }
 }
 
-const m_client = new MarmaladeNGClient(import.meta.env.VITE_CHAINWEB_NODE,
-                                       import.meta.env.VITE_CHAINWEB_NETWORK,
-                                       import.meta.env.VITE_CHAINWEB_CHAIN,
-                                       import.meta.env.VITE_CHAINWEB_NAMESPACE);
+var m_client = new MarmaladeNGClient(import.meta.env.VITE_CHAINWEB_NODE,
+                                     import.meta.env.VITE_CHAINWEB_NETWORK,
+                                     import.meta.env.VITE_CHAINWEB_CHAIN,
+                                     import.meta.env.VITE_CHAINWEB_NAMESPACE);
 
-export {m_client};
+function set_client(new_client)
+{
+  m_client = new_client;
+}
+
+export {MarmaladeNGClient, m_client, set_client};
