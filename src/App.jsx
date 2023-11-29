@@ -1,4 +1,4 @@
-import {useCallback} from 'react'
+import {useCallback, useReducer} from 'react'
 import {m_client} from "./chainweb_marmalade_ng";
 import {version} from './version.js';
 import { Routes, Route, useParams } from 'react-router-dom';
@@ -35,15 +35,18 @@ function SearchField()
           </Form>
 }
 
-const ExplorerMenu = () => (
-  <Menu fixed='top' inverted style={{background:"rgb(30, 50, 61)"}}>
+function ExplorerMenu()
+{
+  const [_, forceUpdate] = useReducer(x => x + 1, 0);
+
+  return <Menu fixed='top' inverted style={{background:"rgb(30, 50, 61)"}}>
       <Menu.Item as={Link} to="/" header>
         <Image size='mini' src={MARM_LOGO} style={{ marginRight: '1.5em' }} />
         Marmalade-NG Explorer
       </Menu.Item>
 
       <InfoModal trigger={<Menu.Item as="a"> <Icon name="info"/> </Menu.Item> }/>
-      <SettingsModal trigger={<Menu.Item as="a"> <Icon name="settings"/> </Menu.Item> }/>
+      <SettingsModal onChange={forceUpdate} trigger={<Menu.Item as="a"> <Icon name="settings"/> </Menu.Item> }/>
 
       <Menu.Item as={Link} to='/collections' >Collections</Menu.Item>
 
@@ -63,7 +66,7 @@ const ExplorerMenu = () => (
     </Menu.Item>
 
   </Menu>
-)
+}
 
 function AccountFromRoute ()
 {

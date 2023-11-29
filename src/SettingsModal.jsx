@@ -4,7 +4,7 @@ import { Button, Modal, Form, Message } from 'semantic-ui-react'
 import {MarmaladeNGClient, m_client, set_client} from "./chainweb_marmalade_ng"
 
 
-function SettingsModal({trigger})
+function SettingsModal({trigger, onChange})
 {
   const [open, setOpen] = useState(false);
   const [data, _setData] = useState({});
@@ -18,6 +18,7 @@ function SettingsModal({trigger})
   const update_client = (new_client) => {set_client(new_client);
                                          mutate( ([k,]) => k !== "/off-chain", undefined,{revalidate:true});
                                          setOpen(false);
+                                         onChange();
                                         }
 
   const validate = () => { const new_client = new MarmaladeNGClient(data.node, data.network, data.chain, data.ns);
