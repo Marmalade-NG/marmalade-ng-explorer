@@ -21,7 +21,7 @@ function SettingsModal({trigger, onChange})
                                          onChange();
                                         }
 
-  const validate = () => { const new_client = new MarmaladeNGClient(data.node, data.network, data.chain, data.ns);
+  const validate = () => { const new_client = new MarmaladeNGClient(data.node, data.network, data.chain, data.ns, data.bridge_ns);
                             new_client.get_modules_hashes()
                                       .then(() => update_client(new_client))
                                       .catch(() => setPactError(true))
@@ -55,6 +55,12 @@ function SettingsModal({trigger, onChange})
                   <label>Namespace</label>
                   <input value={data.ns} onChange ={e => setData({ns:e.target.value})} />
                 </Form.Field>
+
+                <Form.Field>
+                  <label>Bridge_Namespace</label>
+                  <input value={data.bridge_ns} onChange ={e => setData({bridge_ns:e.target.value})} />
+                </Form.Field>
+
               </Form>
 
             {pactError && <Message error header='Marmalade NG Error' content='Modules not found' />}

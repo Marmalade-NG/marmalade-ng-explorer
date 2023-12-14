@@ -84,7 +84,15 @@ const MARMALADE_NG_POLICIES = ["adjustable-royalty",
                                "royalty",
                                "trusted-custody"]
 
+const MARMALADE_NG_BRIDGE_POLICIES = ["inbound",
+                                      "outbound",
+                                      "inbound-guard-mint",
+                                      "inbound-instant-mint"]
+
+
+
 const MARMALADE_NG_CORE_MODS = ["ledger", "std-policies", "util-policies"]
+const MARMALADE_NG_BRIDGE_CORE_MODS = ["bridge", "bridge-utils", "bridge-std-policies"]
 
 
 class MarmaladeNGClient
@@ -94,25 +102,27 @@ class MarmaladeNGClient
   #network;
   #chain;
   #namespace;
+  #bridge_namespace;
 
 
   #batch;
   #batch_defers;
   #batch_id;
 
-  constructor(node, network, chain, namespace)
+  constructor(node, network, chain, namespace, bridge_namespace)
   {
     this.#network = network
     this.#node = node
     this.#chain = chain
     this.#client = createClient(`${node}/chainweb/0.0/${network}/chain/${chain}/pact`);
     this.#namespace = namespace;
+    this.#bridge_namespace = bridge_namespace;
     this.init()
   }
 
   get settings()
   {
-    return {node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace}
+    return {node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace, bridge_ns:this.#bridge_namespace}
   }
 
 
@@ -218,11 +228,25 @@ class MarmaladeNGClient
    }
 
    to_namespace(x) {return `${this.#namespace}.${x}`;}
+   to_br_namespace(x) {return `${this.#bridge_namespace}.${x}`;}
+
 
    get mods()
    {
      return MARMALADE_NG_CORE_MODS.concat( MARMALADE_NG_POLICIES.map( x => "policy-"+x))
    }
+
+  get br_mods()
+  {
+    return MARMALADE_NG_BRIDGE_CORE_MODS.concat( MARMALADE_NG_BRIDGE_POLICIES.map( x => "policy-bridge-"+x))
+  }
+
+  get abs_mods()
+  {
+    return this.mods.map(x=> this.to_namespace(x)).concat(
+           this.br_mods.map(x => this.to_br_namespace(x)))
+  }
+
 
    get ledger()                    {return this.to_namespace("ledger");}
    get policy_collection()         {return this.to_namespace("policy-collection");}
@@ -237,6 +261,12 @@ class MarmaladeNGClient
    get policy_marketplace()        {return this.to_namespace("policy-marketplace");}
    get policy_trusted_custody()    {return this.to_namespace("policy-trusted-custody");}
    get std_polices()               {return this.to_namespace("std-policies");}
+
+   get br_std_polices()               {return this.to_br_namespace("bridge-std-policies");}
+   get policy_bridge_inbound()        {return this.to_br_namespace("policy-bridge-inbound");}
+   get policy_bridge_outbound()       {return this.to_br_namespace("policy-bridge-outbound");}
+   get policy_bridge_inbound_i_mint() {return this.to_br_namespace("policy-bridge-inbound-instant-mint");}
+   get policy_bridge_inbound_g_mint() {return this.to_br_namespace("policy-bridge-inbound-guard-mint");}
 
   local_check(cmd, options)
   {
@@ -297,14 +327,16 @@ class MarmaladeNGClient
 
   get_modules_hashes()
   {
-    return this.local_pact(`(map (lambda (x) [x, (at 'hash (describe-module (+ "${this.to_namespace("")}" x)))]) ${JSON.stringify(this.mods)})`)
+    return this.local_pact(`(map (lambda (x) [x, (at 'hash (describe-module x))]) ${JSON.stringify(this.abs_mods)})`)
   }
 }
 
 var m_client = new MarmaladeNGClient(import.meta.env.VITE_CHAINWEB_NODE,
                                      import.meta.env.VITE_CHAINWEB_NETWORK,
                                      import.meta.env.VITE_CHAINWEB_CHAIN,
-                                     import.meta.env.VITE_CHAINWEB_NAMESPACE);
+                                     import.meta.env.VITE_CHAINWEB_NAMESPACE,
+                                     import.meta.env.VITE_CHAINWEB_BRIDGE_NAMESPACE
+                                   );
 
 function set_client(new_client)
 {
