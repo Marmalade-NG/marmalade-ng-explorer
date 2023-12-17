@@ -1,13 +1,16 @@
 import {useState} from 'react'
-import {useSales, useFixedIssuance, useRoyalty, useGuards, useCustodians, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
+import {useSales, useBridgeDest, useBridgeSrc, useTokenBridging, useFixedIssuance, useRoyalty, useGuards, useCustodians, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {useNFTdata} from "./NFT_data.js"
-import {AccountRef,CopyAccountRef, CopyHeader, CopyLink, TransactionLink} from './Common.jsx'
+import {AccountRef,CopyAccountRef, CopyHeader, CopyLink} from './Common.jsx'
+import {IS_IN, IS_OUT, IN_TYPE, TARGET_IS_NULL, BRIDGE_TYPE, target_type } from './Bridge.js'
 import {SaleModal} from './SaleModal.jsx'
 import { JsonView, collapseAllNested,defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { Link } from 'react-router-dom';
 
-import {Container, Label, Grid, Header, Image, Icon, Radio, Table, Segment} from 'semantic-ui-react'
+import {List, Button, Modal, Container, Label, Grid, Header, Image, Icon, Radio, Table, Segment} from 'semantic-ui-react'
+import BRIDGE_ICON from './assets/bridge.svg'
+
 
 const COLLAPSED = () => false;
 
@@ -138,6 +141,73 @@ function SupplySegment({token_id})
               <Icon name='balance scale' />
                 <Header.Content>Total Supply: {supply.toFixed(precision)}</Header.Content>
             </Header>
+          </Segment>
+}
+
+
+function BridgeTargetTable({name, target})
+{
+  return  <Table size="small">
+            <Table.Header>
+              <Table.Row> <Table.HeaderCell> {name} </Table.HeaderCell> </Table.Row>
+            </Table.Header>
+            <Table.Body>
+            { TARGET_IS_NULL(target)? <Table.Row> <Table.Cell negative>Temporary disabled</Table.Cell> </Table.Row>
+                                    : <>
+                                       <Table.Row> <Table.Cell positive>Ledger</Table.Cell> </Table.Row>
+                                       <Table.Row> <Table.Cell>{target.ledger}</Table.Cell> </Table.Row>
+                                       <Table.Row> <Table.Cell positive>Token</Table.Cell> </Table.Row>
+                                       <Table.Row> <Table.Cell>{target.token}</Table.Cell> </Table.Row>
+                                       <Table.Row> <Table.Cell positive> Chain</Table.Cell> </Table.Row>
+                                       <Table.Row> <Table.Cell>{target.chain}</Table.Cell> </Table.Row>
+                                     </>}
+            </Table.Body>
+          </Table>
+}
+
+
+function BridgeTargetsModal({token_id, trigger})
+{
+  const [open, setOpen] = useState(false)
+  const {bridging} = useTokenBridging(token_id)
+
+  const {dest} = useBridgeDest((IS_OUT(bridging) && open)?token_id:null);
+  const {src} = useBridgeSrc((IS_IN(bridging) && open)?token_id:null, IN_TYPE(bridging));
+
+  return <Modal closeIcon size="small" closeOnDimmerClick={true} onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open} trigger={trigger}>
+      <Modal.Header> Bridge Targets</Modal.Header>
+      <Modal.Content scrolling>
+      {src && <BridgeTargetTable name="Inbound" target={src} /> }
+      {dest && <BridgeTargetTable name="Outbound" target={dest} /> }
+      </Modal.Content>
+      </Modal>
+}
+
+
+function BridgingSegment({token_id})
+{
+  const {bridging} = useTokenBridging(token_id)
+
+  const {dest} = useBridgeDest(IS_OUT(bridging)?token_id:null);
+
+  const {src} = useBridgeSrc(IS_IN(bridging)?token_id:null, IN_TYPE(bridging));
+
+  const label_color = (x) => target_type(token_id,x)==="....."?"gray"
+                            :(target_type(token_id,x)==="Disabled"?"red":
+                              "blue")
+
+  return  <Segment>
+            <Header as='h3'>
+              <Image src={BRIDGE_ICON} />
+                <Header.Content>{BRIDGE_TYPE(bridging)}</Header.Content>
+            </Header>
+            <List divided relaxed>
+
+
+            {IS_IN(bridging) && <List.Item> <Label size="medium" color={label_color(src)}><Icon name='sign-in' />{target_type(token_id,src)}</Label><Label tag>{IN_TYPE(bridging)} Mint</Label></List.Item>}
+            {IS_OUT(bridging) && <List.Item> <Label size="medium" color={label_color(dest)} ><Icon name='sign-out' />{target_type(token_id,dest)}</Label></List.Item>}
+            {bridging && <List.Item><BridgeTargetsModal token_id={token_id} trigger={<Button size="tiny">Details</Button>} /></List.Item>}
+          </List>
           </Segment>
 }
 
@@ -302,6 +372,7 @@ function TokenView({token_id})
   const {data} = useNFTdata(uri);
   const {policies} = useTokenPolicies(token_id)
 
+
   return  <Segment>
             <CopyHeader as="h1">{token_id}</CopyHeader>
             <Grid relaxed columns={2}>
@@ -315,6 +386,8 @@ function TokenView({token_id})
                   {uri && <Container style={{overflowWrap:"break-word", fontStyle:"italic"}}>{uri}</Container>}
                   <JsonView data={data.meta} shouldExpandNode={collapseAllNested} style={defaultStyles} />
                 </Segment>
+
+                <BridgingSegment token_id={token_id} />
               </Grid.Column>
               <Grid.Column width={11}>
                 <OwnersTable token_id={token_id} />

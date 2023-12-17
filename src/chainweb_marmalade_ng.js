@@ -134,6 +134,21 @@ class MarmaladeNGClient
                  "/policies":
                     {cmd: id => `(${this.std_polices}.policies-to-list (${this.ledger}.get-policies "${id}"))`,
                      post: x => x},
+                "/bridging":
+                    {cmd: id => `(${this.br_std_polices}.from-bridging-policies (${this.ledger}.get-policies "${id}"))`,
+                     post: x => x},
+                "/bridgeDst":
+                    {cmd: id => `(${this.policy_bridge_outbound}.get-data "${id}")`,
+                     post: ({dest}) => dest},
+                "/bridgeSrc/NO":
+                    {cmd: id => `(${this.policy_bridge_inbound}.get-data "${id}")`,
+                     post: ({source}) => source},
+                "/bridgeSrc/INSTANT":
+                    {cmd: id => `(${this.policy_bridge_inbound_i_mint}.get-data "${id}")`,
+                     post: ({source}) => source},
+                "/bridgeSrc/GUARD":
+                    {cmd: id => `(${this.policy_bridge_inbound_g_mint}.get-data "${id}")`,
+                     post: ({source}) => source},
                  "/tokenCollection":
                     {cmd: id => `{'c:(${this.policy_collection}.get-token-collection "${id}"),
                                   'r:(${this.policy_collection}.get-token-rank-in-collection "${id}")}`,

@@ -46,6 +46,30 @@ export function useTokenPolicies(token_id)
   return {policies:data??[], error}
 }
 
+export function useTokenBridging(token_id)
+{
+  const {data, error} = useSWRImmutable(token_id?["/bridging", token_id]:null, x => {return m_client.batch(x)})
+  if(error)
+    console.warn(error);
+  return {bridging:data, error}
+}
+
+export function useBridgeDest(token_id)
+{
+  const {data, error} = useSWR(token_id?["/bridgeDst", token_id]:null, x => {return m_client.batch(x)})
+  if(error)
+    console.warn(error);
+  return {dest:data, error}
+}
+
+export function useBridgeSrc(token_id, policy)
+{
+  const {data, error} = useSWR(token_id?["/bridgeSrc/"+policy, token_id]:null, x => {return m_client.batch(x)})
+  if(error)
+    console.warn(error);
+  return {src:data, error}
+}
+
 export function useTokenExtraPolicies(token_id)
 {
   const {data, error} = useSWR(token_id?["/extra_policies", token_id]:null, x => {return m_client.batch(x)})
