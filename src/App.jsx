@@ -10,7 +10,10 @@ import {CollectionsList} from './CollectionsLists.jsx';
 import {Sales} from './Sales.jsx';
 import {TokenView} from './Token.jsx';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCookies } from 'react-cookie';
 import MARM_LOGO from './assets/marm_logo.png'
+import {set_client_from_data} from "./chainweb_marmalade_ng"
+import {INSTANCES} from './OnChainRefs.js';
 
 
 import 'semantic-ui-css/semantic.min.css'
@@ -94,8 +97,14 @@ function TokenFromRoute ()
 
 const Root = () => <CollectionsList />
 
-const App = () => (
-  <div>
+function App ()
+{
+  const [cookies] = useCookies([]);
+  const instance = cookies.instance ?? INSTANCES[import.meta.env.VITE_DEFAULT_INSTANCE];
+  set_client_from_data(instance);
+
+
+  return <div>
     <ExplorerMenu />
     <Container style={{paddingTop:"100px"}}>
       <Routes>
@@ -108,6 +117,6 @@ const App = () => (
       </Routes>
     </Container>
   </div>
-  )
+}
 
 export default App

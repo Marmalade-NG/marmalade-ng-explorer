@@ -7,7 +7,7 @@ const EXPLORER = "https://explorer.chainweb.com/testnet"
 
 const tx_detail = x => `${EXPLORER}/txdetail/${x}`
 
-function CopyButton({value, fontsize=16})
+export function CopyButton({value, fontsize=16})
 {
   const to_copy = useCallback(() => navigator.clipboard.writeText(value.toString()), [value])
   return  <Popup content="Copied" on='click' hideOnScroll

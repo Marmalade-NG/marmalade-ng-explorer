@@ -1,6 +1,7 @@
 import {createClient, Pact,} from '@kadena/client'
 import Deferred from 'promise-deferred'
 import Decimal from 'decimal.js';
+import {INSTANCES} from './OnChainRefs.js';
 
 const to_dec = x => typeof x == "object"?Decimal(x.decimal):Decimal(x)
 const to_int = x => typeof x == "object"?BigInt(x.int):BigInt(x)
@@ -97,6 +98,7 @@ const MARMALADE_NG_BRIDGE_CORE_MODS = ["bridge", "bridge-utils", "bridge-std-pol
 
 class MarmaladeNGClient
 {
+  #name
   #client;
   #node;
   #network;
@@ -109,8 +111,9 @@ class MarmaladeNGClient
   #batch_defers;
   #batch_id;
 
-  constructor(node, network, chain, namespace, bridge_namespace)
+  constructor(name, node, network, chain, namespace, bridge_namespace)
   {
+    this.#name = name
     this.#network = network
     this.#node = node
     this.#chain = chain
@@ -122,7 +125,7 @@ class MarmaladeNGClient
 
   get settings()
   {
-    return {node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace, bridge_ns:this.#bridge_namespace}
+    return {name:this.#name, node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace, bridge_ns:this.#bridge_namespace}
   }
 
 
@@ -346,16 +349,19 @@ class MarmaladeNGClient
   }
 }
 
-var m_client = new MarmaladeNGClient(import.meta.env.VITE_CHAINWEB_NODE,
-                                     import.meta.env.VITE_CHAINWEB_NETWORK,
-                                     import.meta.env.VITE_CHAINWEB_CHAIN,
-                                     import.meta.env.VITE_CHAINWEB_NAMESPACE,
-                                     import.meta.env.VITE_CHAINWEB_BRIDGE_NAMESPACE
-                                   );
+const default_instance = INSTANCES[import.meta.env.VITE_DEFAULT_INSTANCE]
+var m_client = null;
 
 function set_client(new_client)
 {
   m_client = new_client;
 }
 
-export {MarmaladeNGClient, m_client, set_client};
+
+function set_client_from_data(data)
+{
+  set_client(new MarmaladeNGClient(data.name, data.node, data.network, data.chain, data.ns, data.bridge_ns))
+}
+
+
+export {MarmaladeNGClient, m_client, set_client, set_client_from_data};
