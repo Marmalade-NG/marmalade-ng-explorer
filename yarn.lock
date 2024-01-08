@@ -442,10 +442,10 @@
     "@kadena/pactjs" "0.4.2"
     cross-fetch "~3.1.5"
 
-"@kadena/client@1.6.4":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@kadena/client/-/client-1.6.4.tgz#e4b3f9e6d78e81647f4b4238cdc8616de4157459"
-  integrity sha512-ByMi+CCz3Wwc3HUNnqREfBsDnFFTK4oeCiS6eIAGtgpu1l8kVHWptkybw2LLXVT+1XM9WAMcGg5BgQBAs+cACQ==
+"@kadena/client@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@kadena/client/-/client-1.7.0.tgz#a34a079c7233b7dbf3520a486aa03bfd3233a809"
+  integrity sha512-GI+Ke80jn4MVO82dRfhX67/y83chNT9tvDJtxyhXsbw1LaNXNHv86dXYEDiPfkec9B+DWUPWb2jgem2Veux8PQ==
   dependencies:
     "@kadena/chainweb-node-client" "0.5.2"
     "@kadena/cryptography-utils" "0.4.2"
