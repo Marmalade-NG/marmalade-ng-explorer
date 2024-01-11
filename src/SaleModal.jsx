@@ -57,7 +57,6 @@ function FixedSaleRows({sale})
 
 function AuctionSaleRows({sale})
 {
-  console.log(sale)
   return <> <Table.Row>
               <Table.Cell> Start price </Table.Cell><Table.Cell> {sale["start-price"].toFixed(3)} </Table.Cell>
             </Table.Row>
