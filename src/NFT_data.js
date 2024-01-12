@@ -9,9 +9,9 @@ const EMPTY_META = {name:"", description:""};
 const DEFAULT_DATA = {meta:null, img:EMPTY_IMG}
 const DEFAULT_MISSING = {meta:null, img:MISSING_IMG}
 
+const GATEWAYS = [".dweb.link", "ipfs.io", "cloudflare-ipfs.com", ".cf-ipfs.com", "gateway.pinata.cloud"];
 
-const to_path_resolution = (gw, cid) => "https://" + [gw, "ipfs", cid].join("/");
-const to_subdom_resolution = (gw, cid) => "https://" + [cid, "ipfs", gw].join(".");
+const ipfs_resolution = (gw, cid) =>  "https://" + (gw.startsWith(".")?(cid + ".ipfs" + gw):(gw + "/ipfs/" + cid))
 
 
 const del_fetch = (d, sig, uri) => delay(d, {signal:sig})
@@ -24,13 +24,10 @@ function _fetch(uri)
   {
     const cid = CID.parse(_cid).toV1().toString()
     const ctr = new AbortController();
-
-    return Promise.any([ del_fetch(0, ctr.signal, to_subdom_resolution("dweb.link", cid)),
-                         del_fetch(2000, ctr.signal, to_path_resolution("ipfs.io", cid)),
-                         del_fetch(4000, ctr.signal, to_path_resolution("cloudflare-ipfs.com", cid)),
-                         del_fetch(6000, ctr.signal, to_subdom_resolution("cf-ipfs.com", cid)),
-                         del_fetch(8000, ctr.signal, to_path_resolution("gateway.pinata.cloud", cid))
-                       ]).then(x => {ctr.abort(); return x})
+    /* Uncomment to round robin */
+    /*GATEWAYS.push(GATEWAYS.shift());*/
+    return Promise.any(GATEWAYS.map((g, i) => del_fetch(i*2500, ctr.signal, ipfs_resolution(g, cid))))
+                  .then(x => {ctr.abort(); return x})
   }
   else
     return fetch(uri);
