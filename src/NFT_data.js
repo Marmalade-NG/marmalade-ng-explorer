@@ -11,8 +11,11 @@ const DEFAULT_MISSING = {meta:null, img:MISSING_IMG}
 
 const GATEWAYS = [".dweb.link", "ipfs.io", "cloudflare-ipfs.com", ".cf-ipfs.com", "gateway.pinata.cloud"];
 
+const KDAFS_GATEWAY = "gw.marmalade-ng.xyz"
+
 const ipfs_resolution = (gw, cid) =>  "https://" + (gw.startsWith(".")?(cid + ".ipfs" + gw):(gw + "/ipfs/" + cid))
 
+const kdafs_resolution = (gw, cid) =>  "https://" + gw + "/kdafs/" + cid;
 
 const del_fetch = (d, sig, uri) => delay(d, {signal:sig})
                                    .then(() => fetch(uri))
@@ -29,6 +32,8 @@ function _fetch(uri)
     return Promise.any(GATEWAYS.map((g, i) => del_fetch(i*2500, ctr.signal, ipfs_resolution(g, cid))))
                   .then(x => {ctr.abort(); return x})
   }
+  else if(protocol == "kdafs:")
+    return fetch(kdafs_resolution(KDAFS_GATEWAY, _cid))
   else
     return fetch(uri);
 }
@@ -54,7 +59,7 @@ function fetchData(uri)
   return _fetch(uri)
          .then((resp) => {if(resp.headers.get("content-type").startsWith("image"))
                             return image_result(resp)
-                          else if(resp.headers.get("content-type") === "application/json")
+                          else if(resp.headers.get("content-type").startsWith("application/json"))
                             return meta_result(resp);
                           else
                             throw Error("Unknown data")})
