@@ -40,7 +40,7 @@ function SearchField()
 
 function ExplorerMenu()
 {
-  const [_, forceUpdate] = useReducer(x => x + 1, 0);
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   return <Menu fixed='top' inverted style={{background:"rgb(30, 50, 61)"}}>
       <Menu.Item as={Link} to="/" header>

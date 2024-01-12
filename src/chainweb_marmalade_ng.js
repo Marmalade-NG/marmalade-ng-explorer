@@ -1,7 +1,6 @@
 import {createClient, Pact,} from '@kadena/client'
 import Deferred from 'promise-deferred'
 import Decimal from 'decimal.js';
-import {INSTANCES} from './OnChainRefs.js';
 
 const to_dec = x => typeof x == "object"?Decimal(x.decimal):Decimal(x)
 const to_int = x => typeof x == "object"?BigInt(x.int):BigInt(x)
@@ -358,7 +357,6 @@ class MarmaladeNGClient
   }
 }
 
-const default_instance = INSTANCES[import.meta.env.VITE_DEFAULT_INSTANCE]
 var m_client = null;
 
 function set_client(new_client)

@@ -13,7 +13,7 @@ function SettingsModal({trigger, onChange})
   const [data, _setData] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [pactError, setPactError] = useState(false)
-  const [cookies, setCookies]= useCookies([]);
+  const [, setCookies]= useCookies([]);
 
 
   const { mutate } = useSWRConfig();
