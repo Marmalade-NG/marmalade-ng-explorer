@@ -290,7 +290,7 @@ class MarmaladeNGClient
   {
     return this.#client.local(cmd, options)
           .then((resp) => { if(resp?.result?.status !== 'success')
-                             {console.warn(resp); throw Error("Error in local call");}
+                             {console.warn(resp); throw Error(`Error in local call:${resp?.result?.error?.message}`);}
                             else
                               return resp.result.data;});
   }
