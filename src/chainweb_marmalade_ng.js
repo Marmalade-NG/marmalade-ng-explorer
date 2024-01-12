@@ -101,8 +101,6 @@ class MarmaladeNGClient
   #name
   #client;
   #node;
-  #network;
-  #chain;
   #namespace;
   #bridge_namespace;
 
@@ -114,9 +112,9 @@ class MarmaladeNGClient
   constructor(name, node, network, chain, namespace, bridge_namespace)
   {
     this.#name = name
-    this.#network = network
+    this.network = network
     this.#node = node
-    this.#chain = chain
+    this.chain = chain
     this.#client = createClient(`${node}/chainweb/0.0/${network}/chain/${chain}/pact`);
     this.#namespace = namespace;
     this.#bridge_namespace = bridge_namespace;
@@ -125,7 +123,7 @@ class MarmaladeNGClient
 
   get settings()
   {
-    return {name:this.#name, node:this.#node, network:this.#network, chain:this.#chain, ns:this.#namespace, bridge_ns:this.#bridge_namespace}
+    return {name:this.#name, node:this.#node, network:this.network, chain:this.chain, ns:this.#namespace, bridge_ns:this.#bridge_namespace}
   }
 
 
@@ -242,7 +240,7 @@ class MarmaladeNGClient
 
    get network_refs()
    {
-     return `${this.#network} / ${this.#chain} / ${this.#namespace}`;
+     return `${this.network} / ${this.chain} / ${this.#namespace}`;
    }
 
    to_namespace(x) {return `${this.#namespace}.${x}`;}
@@ -299,10 +297,21 @@ class MarmaladeNGClient
   {
     const cmd = Pact.builder
                     .execution(pact_code)
-                    .setMeta({chainId:this.#chain, gasLimit:LOCAL_GAS_LIMIT})
-                    .setNetworkId(this.#network)
+                    .setMeta({chainId:this.chain, gasLimit:LOCAL_GAS_LIMIT})
+                    .setNetworkId(this.network)
                     .createTransaction();
     return this.local_check(cmd, {signatureVerification:false, preflight:false});
+  }
+
+  send(cmd)
+  {
+    return this.#client.send(cmd);
+  }
+
+  preflight(cmd)
+  {
+    return this.local_check(cmd, {signatureVerification:true, preflight:true})
+               .then(()=> cmd)
   }
 
   list_holders(token_id)
