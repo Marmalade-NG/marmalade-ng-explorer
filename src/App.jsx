@@ -14,6 +14,7 @@ import { useCookies } from 'react-cookie';
 import MARM_LOGO from './assets/marm_logo.png'
 import {set_client_from_data} from "./chainweb_marmalade_ng"
 import {INSTANCES} from './OnChainRefs.js';
+import {Buying} from './Buying.jsx';
 
 
 import 'semantic-ui-css/semantic.min.css'
@@ -89,6 +90,12 @@ function SalesFromRoute ()
   return <Sales sale_type={sale_type} />
 }
 
+function BuyFromRoute ()
+{
+  const {sale_id} = useParams()
+  return <Buying sale_id={sale_id} />
+}
+
 function TokenFromRoute ()
 {
   const {token_ref} = useParams()
@@ -112,6 +119,7 @@ function App ()
         <Route path="collection/:collection_ref" element={<CollectionFromRoute />} />
         <Route path="collections" element={<CollectionsList />} />
         <Route path="sales/:sale_type" element={<SalesFromRoute />} />
+        <Route path="buy/:sale_id" element={<BuyFromRoute />} />
         <Route path="token/:token_ref" element={<TokenFromRoute />} />
         <Route path="" element={<Root />} />
       </Routes>

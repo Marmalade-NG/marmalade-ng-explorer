@@ -92,7 +92,9 @@ function CommonSaleRow({sale})
 
   return <>
           <Table.Row style={{backgroundColor:"MistyRose"}}>
-            <Table.Cell colSpan={5} textAlign="center"><b>Sale ID: </b> <CopyLink val={sale_id} onClick={()=>setSaleModalOpen(true)} /></Table.Cell>
+            <Table.Cell colSpan={5} textAlign="center"><b>Sale ID: </b> <CopyLink val={sale_id} onClick={()=>setSaleModalOpen(true)} />
+            {sale.type == 'f' && <Button size="tiny" circular primary as={Link} to={"/buy/"+sale_id}> Buy </Button>}
+            </Table.Cell>
           </Table.Row>
           <SaleModal open={saleModalOpen} onClose={()=>setSaleModalOpen(false)} sale={sale}  />
           </>

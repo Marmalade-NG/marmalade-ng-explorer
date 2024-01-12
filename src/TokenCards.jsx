@@ -1,13 +1,19 @@
 import {useNFTdata} from "./NFT_data.js"
 import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {Link} from 'react-router-dom';
-import {Container, Card, Image, Label} from 'semantic-ui-react'
+import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react'
 
 
 function FixedSale({sale_id})
 {
   const {sale} = useSale(sale_id, "f");
-  return <Label color="blue">For Sale (Fixed) <br/> Price = {sale?sale.price.toFixed(2):"...."} KDA </Label>
+  return  <div style={{display:"flex"}}>
+            <Label color="red">For Sale (Fixed) <br/> Price = {sale?sale.price.toFixed(2):"...."} KDA </Label>
+            <Button circular primary animated='vertical' as={Link} to={"/buy/"+sale_id}>
+                                                        <Button.Content visible>Buy</Button.Content>
+                                                        <Button.Content hidden> <Icon name='shop' /> </Button.Content>
+                                                      </Button>
+          </div>
 }
 
 function AuctionSale({sale_id})
