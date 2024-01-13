@@ -7,6 +7,10 @@ import {MarmaladeNGClient, m_client, set_client} from "./chainweb_marmalade_ng"
 import {INSTANCES} from './OnChainRefs.js'
 
 
+const ONE_MONTH = 1000*60*60*24*30
+
+const in_one_month = () => new Date(Date.now() + ONE_MONTH)
+
 function SettingsModal({trigger, onChange})
 {
   const [open, setOpen] = useState(false);
@@ -29,7 +33,7 @@ function SettingsModal({trigger, onChange})
                             }
 
   const update_client = (new_client) => {set_client(new_client);
-                                         setCookies("instance", data);
+                                         setCookies("instance", data, {expires:in_one_month()});
                                          mutate( ([k,]) => k !== "/off-chain", undefined,{revalidate:true});
                                          setOpen(false);
                                          onChange();
