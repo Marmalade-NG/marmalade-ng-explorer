@@ -115,19 +115,17 @@ function TransactionManager({trx, signer})
     const [successful, setSuccessful] = useState(false);
     const [signatureModal, setSignatureModal] = useState(false);
 
-    useEffect(() => {console.log("Effect");
-                     setLocalResult(null);
-                     setLocalError(false);
-                     setSigSendError(null);
-                     setSuccessful(false);
-                     if(trx)
-                      {console.log("Launch"); console.log(trx);
-
+    useEffect(() => { setLocalResult(null);
+                      setLocalError(false);
+                      setSigSendError(null);
+                      setSuccessful(false);
+                      if(trx)
+                      {
                         m_client.local_check(trx, {signatureVerification:false, preflight:false})
                                 .then(setLocalResult)
                                 .catch((e)=>{setLocalResult(e); setLocalError(true)})
                       }
-                      },[trx]);
+                    },[trx]);
 
     const do_sign = () => { setSigSendError(null);
                             setSuccessful(false);
@@ -171,7 +169,6 @@ function BuyingForm({sale})
                                                                                  .catch(() => setKeyError(true))}
 
   const key = guard?.keys?.[0] ?? "";
-  console.log(keyError)
 
   /* Here we only use sale?.['sale-id'] as a dependency, to be sure the transaction is not re-generated when the sale object is updated by SWR */
   // eslint-disable-next-line react-hooks/exhaustive-deps
