@@ -212,7 +212,7 @@ function SaleDetails({sale})
             <Table.Body>
               <Table.Row>
                 <Table.Cell><Label ribbon>Amount</Label></Table.Cell>
-                <Table.Cell>{sale.amount.toFixed(precision)} / {supply.toFixed(precision)} </Table.Cell>
+                <Table.Cell>{sale.amount.toFixed(precision)} / {supply?supply.toFixed(precision):""} </Table.Cell>
               </Table.Row>
               <Table.Row>
                 <Table.Cell><Label color="blue" ribbon>Price</Label></Table.Cell>
