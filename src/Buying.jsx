@@ -73,7 +73,7 @@ function EckoWalletCard({selected, onClick, onAccount})
                                .finally(() => setIsConnecting(false))
                           }
 
-  return  <Dimmer.Dimmable as={Card} dimmed={!ecko.isInstalled() || isConnecting} raised={selected} onClick={ecko.isInstalled()?_onClick:null} color={selected?"green":""} >
+  return  <Dimmer.Dimmable as={Card} dimmed={!ecko.isInstalled() || isConnecting} raised={selected} onClick={ecko.isInstalled()?_onClick:null} color={selected?"green":undefined} >
             {selected && <SelectedLabel />}
             <Dimmer inverted active={!ecko.isInstalled() || isConnecting} />
             <Loader active={isConnecting} />
@@ -86,7 +86,7 @@ function EckoWalletCard({selected, onClick, onAccount})
 
 function ChainWeaverCard({selected, onClick})
 {
-  return  <Card onClick={onClick} raised={selected} color={selected?"green":""}>
+  return  <Card onClick={onClick} raised={selected} color={selected?"green":undefined}>
             {selected && <SelectedLabel />}
             <Card.Content header='Chainweaver'/>
             <Card.Content >
@@ -97,7 +97,7 @@ function ChainWeaverCard({selected, onClick})
 
 function ChainWeaverDesktopCard({selected, onClick})
 {
-  return  <Card onClick={onClick} raised={selected} color={selected?"green":""}>
+  return  <Card onClick={onClick} raised={selected} color={selected?"green":undefined}>
             {selected && <SelectedLabel />}
             <Card.Content header='Chainweaver Desktop'/>
             <Card.Content >
