@@ -173,7 +173,9 @@ function BuyingForm({sale})
   const key = guard?.keys?.[0] ?? "";
   console.log(keyError)
 
-  const transaction = useMemo(() => (sale && account && guard && key)?make_trx(sale, account, guard):null, [sale?.['sale-id'], account, guard])
+  /* Here we only use sale?.['sale-id'] as a dependency, to be sure the transaction is not re-generated when the sale object is updated by SWR */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const transaction = useMemo(() => (sale && account && guard && key)?make_trx(sale, account, guard):null, [sale?.['sale-id'], account, key, guard])
 
   return  <>
             <Card.Group itemsPerRow={3}>
