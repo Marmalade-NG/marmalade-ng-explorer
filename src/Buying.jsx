@@ -77,7 +77,7 @@ function EckoWalletCard({selected, onClick, onAccount})
             {selected && <SelectedLabel />}
             <Dimmer inverted active={!ecko.isInstalled() || isConnecting} />
             <Loader active={isConnecting} />
-            <Card.Content header='EckoWallet'/>
+            <Card.Content header='EckoWallet' style={{minHeight:"70px"}}/>
             <Card.Content >
               <Image src={ECKO_LOGO} />
             </Card.Content>
@@ -88,7 +88,7 @@ function ChainWeaverCard({selected, onClick})
 {
   return  <Card onClick={onClick} raised={selected} color={selected?"green":undefined}>
             {selected && <SelectedLabel />}
-            <Card.Content header='Chainweaver'/>
+            <Card.Content header='Chainweaver' style={{minHeight:"70px"}}/>
             <Card.Content >
               <Image src={CHAINWEAVER_LOGO} />
             </Card.Content>
@@ -99,7 +99,7 @@ function ChainWeaverDesktopCard({selected, onClick})
 {
   return  <Card onClick={onClick} raised={selected} color={selected?"green":undefined}>
             {selected && <SelectedLabel />}
-            <Card.Content header='Chainweaver Desktop'/>
+            <Card.Content header='Chainweaver Desktop' style={{minHeight:"70px"}}/>
             <Card.Content >
               <Image src={CHAINWEAVER_LOGO} />
             </Card.Content>
