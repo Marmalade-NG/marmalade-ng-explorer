@@ -1,9 +1,10 @@
 import {useState, useMemo, useEffect} from 'react'
 import YAML from 'yaml'
+import {Decimal} from 'decimal.js';
 import {Grid, Card, Label, Message, Form,  TextArea, Loader, Dimmer, Image, Container, Header, Segment, Button, Modal, Table } from 'semantic-ui-react'
 import {CopyHeader, CopyButton, Price} from './Common.jsx'
 import {TokenCard} from './TokenCards.jsx'
-import {useSale, usePrecision, useTokenSupply} from "./SWR_Hooks.js"
+import {useSale, usePrecision, useTokenSupply, useDutchPrice} from "./SWR_Hooks.js"
 import {m_client} from "./chainweb_marmalade_ng"
 import {createEckoWalletQuicksign, signWithChainweaver} from '@kadena/client'
 import ECKO_LOGO from './assets/ecko-wallet-rounded.png';
@@ -220,20 +221,26 @@ function SaleDetails({sale})
           </Table>
 }
 
+const TITLES = {f:"Buy at Fixed Price", d:"Buy with Dutch auction", a:"Bid for an auction"}
 
 function Buying({sale_id, sale_type})
 {
   const {sale} = useSale(sale_id, sale_type)
 
+  /* In case of dutch auction => Copy the price into the sale object */
+  const {price} = useDutchPrice(sale_type=="d"?sale_id:null)
+  if(sale && sale_type == "d" && price)
+    sale.price = price.toDecimalPlaces(2, Decimal.ROUND_UP);
+    
   return <Container>
             <Segment color="purple" stacked compact>
-              <Header as="h1"> Buy at Fixed Price </Header>
+              <Header as="h1"> {TITLES[sale_type]}  </Header>
               <CopyHeader>{sale_id}</CopyHeader>
             </Segment>
             {sale && <Grid celled>
                       <Grid.Column width={4}>
                         <TokenCard token_id={sale['token-id']} />
-                        <SaleDetails sale={sale} />
+                        <SaleDetails sale={sale} sale_type={sale_type} />
                       </Grid.Column>
 
                       <Grid.Column width={8}>

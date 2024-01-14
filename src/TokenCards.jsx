@@ -4,15 +4,17 @@ import {Link} from 'react-router-dom';
 import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
 
+const BuyButton = ({link}) => <Button circular primary animated='vertical' as={Link} to={link}>
+                                            <Button.Content visible>Buy</Button.Content>
+                                            <Button.Content hidden> <Icon name='shop' /> </Button.Content>
+                                          </Button>
+
 function FixedSale({sale_id})
 {
   const {sale} = useSale(sale_id, "f");
   return  <div style={{display:"flex"}}>
             <Label color="red">For Sale (Fixed) <br/> Price = <Price value={sale?.price} curr={sale?.currency} /> </Label>
-            <Button circular primary animated='vertical' as={Link} to={"/buy/f/"+sale_id}>
-                                                        <Button.Content visible>Buy</Button.Content>
-                                                        <Button.Content hidden> <Icon name='shop' /> </Button.Content>
-                                                      </Button>
+            <BuyButton link={"/buy/f/"+sale_id} />
           </div>
 }
 
@@ -30,8 +32,12 @@ function DutchAuctionSale({sale_id})
 {
   const {sale} = useSale(sale_id, "d");
   const {price} = useDutchPrice(sale?sale_id:null)
-  return <><Label color="blue">For Sale (Dutch Auction) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label></>
+  return  <div style={{display:"flex"}}>
+            <Label color="blue">For Sale (Dutch A.) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label>
+            <BuyButton link={"/buy/d/"+sale_id} />
+          </div>
 }
+
 
 function TokenCard({token_id, balance, sale_type, sale_id})
 {
