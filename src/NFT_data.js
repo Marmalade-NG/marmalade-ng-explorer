@@ -9,7 +9,7 @@ const EMPTY_META = {name:"", description:""};
 const DEFAULT_DATA = {meta:null, img:EMPTY_IMG}
 const DEFAULT_MISSING = {meta:null, img:MISSING_IMG}
 
-const GATEWAYS = [".dweb.link", "ipfs.io", "cloudflare-ipfs.com", ".cf-ipfs.com", "gateway.pinata.cloud"];
+const GATEWAYS = [".dweb.link", "ipfs.io", ".nftstorage.link", "cloudflare-ipfs.com", ".cf-ipfs.com", "gateway.pinata.cloud"];
 
 const KDAFS_GATEWAY = "gw.marmalade-ng.xyz"
 
