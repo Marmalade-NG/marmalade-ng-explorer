@@ -92,8 +92,8 @@ function SalesFromRoute ()
 
 function BuyFromRoute ()
 {
-  const {sale_id} = useParams()
-  return <Buying sale_id={sale_id} />
+  const {sale_id, sale_type} = useParams()
+  return <Buying sale_id={sale_id} sale_type={sale_type} />
 }
 
 function TokenFromRoute ()
@@ -119,7 +119,7 @@ function App ()
         <Route path="collection/:collection_ref" element={<CollectionFromRoute />} />
         <Route path="collections" element={<CollectionsList />} />
         <Route path="sales/:sale_type" element={<SalesFromRoute />} />
-        <Route path="buy/:sale_id" element={<BuyFromRoute />} />
+        <Route path="buy/:sale_type/:sale_id" element={<BuyFromRoute />} />
         <Route path="token/:token_ref" element={<TokenFromRoute />} />
         <Route path="" element={<Root />} />
       </Routes>

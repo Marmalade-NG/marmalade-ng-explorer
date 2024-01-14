@@ -221,9 +221,9 @@ function SaleDetails({sale})
 }
 
 
-function Buying({sale_id})
+function Buying({sale_id, sale_type})
 {
-  const {sale} = useSale(sale_id, "f")
+  const {sale} = useSale(sale_id, sale_type)
 
   return <Container>
             <Segment color="purple" stacked compact>

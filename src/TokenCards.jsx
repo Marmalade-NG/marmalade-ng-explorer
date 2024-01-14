@@ -9,7 +9,7 @@ function FixedSale({sale_id})
   const {sale} = useSale(sale_id, "f");
   return  <div style={{display:"flex"}}>
             <Label color="red">For Sale (Fixed) <br/> Price = <Price value={sale?.price} curr={sale?.currency} /> </Label>
-            <Button circular primary animated='vertical' as={Link} to={"/buy/"+sale_id}>
+            <Button circular primary animated='vertical' as={Link} to={"/buy/f/"+sale_id}>
                                                         <Button.Content visible>Buy</Button.Content>
                                                         <Button.Content hidden> <Icon name='shop' /> </Button.Content>
                                                       </Button>

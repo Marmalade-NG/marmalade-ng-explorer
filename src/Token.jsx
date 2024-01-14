@@ -42,7 +42,7 @@ function OwnersTable({token_id})
 function FixedSaleRow({sale, prec})
 {
   return  <>
-          <CommonSaleRow sale={sale} />
+          <CommonSaleRow sale={sale} sale_type="f"/>
           <Table.Row>
             <Table.Cell> Fixed price </Table.Cell>
             <Table.Cell> <AccountRef account={sale.seller} /></Table.Cell>
@@ -58,7 +58,7 @@ function DutchAuctionSaleRow({sale, prec})
   const {price} = useDutchPrice(sale["sale-id"])
 
   return  <>
-          <CommonSaleRow sale={sale} />
+          <CommonSaleRow sale={sale} sale_type="d"/>
           <Table.Row>
             <Table.Cell> Dutch Auction </Table.Cell>
             <Table.Cell> <AccountRef account={sale.seller} /></Table.Cell>
@@ -73,7 +73,7 @@ function AuctionSaleRow({sale, prec})
 {
   const price = sale["current-price"].eq("0.0")?sale["start-price"]:sale["current-price"].mul(sale["increment-ratio"]);
   return  <>
-          <CommonSaleRow sale={sale} />
+          <CommonSaleRow sale={sale} sale_type="a"/>
           <Table.Row>
             <Table.Cell> Auction </Table.Cell>
             <Table.Cell> <AccountRef account={sale.seller} /></Table.Cell>
@@ -85,15 +85,16 @@ function AuctionSaleRow({sale, prec})
 }
 /**/
 
-function CommonSaleRow({sale})
+function CommonSaleRow({sale, sale_type})
 {
   const [saleModalOpen, setSaleModalOpen] = useState(false)
   const sale_id = sale["sale-id"]
+  const buy_link = ["", "buy", sale_type, sale_id].join("/")
 
   return <>
           <Table.Row style={{backgroundColor:"MistyRose"}}>
             <Table.Cell colSpan={5} textAlign="center"><b>Sale ID: </b> <CopyLink val={sale_id} onClick={()=>setSaleModalOpen(true)} />
-            {sale.type == 'f' && <Button size="tiny" circular primary as={Link} to={"/buy/"+sale_id}> Buy </Button>}
+            {sale.type == 'f' && <Button size="tiny" circular primary as={Link} to={buy_link}> Buy </Button>}
             </Table.Cell>
           </Table.Row>
           <SaleModal open={saleModalOpen} onClose={()=>setSaleModalOpen(false)} sale={sale}  />
