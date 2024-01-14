@@ -1,14 +1,14 @@
 import {useNFTdata} from "./NFT_data.js"
 import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {Link} from 'react-router-dom';
-import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react'
-
+import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react';
+import {Price} from './Common.jsx';
 
 function FixedSale({sale_id})
 {
   const {sale} = useSale(sale_id, "f");
   return  <div style={{display:"flex"}}>
-            <Label color="red">For Sale (Fixed) <br/> Price = {sale?sale.price.toFixed(2):"...."} KDA </Label>
+            <Label color="red">For Sale (Fixed) <br/> Price = <Price value={sale?.price} curr={sale?.currency} /> </Label>
             <Button circular primary animated='vertical' as={Link} to={"/buy/"+sale_id}>
                                                         <Button.Content visible>Buy</Button.Content>
                                                         <Button.Content hidden> <Icon name='shop' /> </Button.Content>
@@ -23,14 +23,14 @@ function AuctionSale({sale_id})
   let price;
   if(sale)
     price = sale["current-price"].eq("0.0")?sale["start-price"]:sale["current-price"].mul(sale["increment-ratio"]);
-  return <><Label color="blue">For Sale (Auction) <br/> Price = {price?price.toFixed(2):"...."} KDA </Label></>
+  return <><Label color="blue">For Sale (Auction) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label></>
 }
 
 function DutchAuctionSale({sale_id})
 {
   const {sale} = useSale(sale_id, "d");
   const {price} = useDutchPrice(sale?sale_id:null)
-  return <><Label color="blue">For Sale (Dutch Auction) <br/> Price = {price?price.toFixed(2):"...."} KDA </Label></>
+  return <><Label color="blue">For Sale (Dutch Auction) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label></>
 }
 
 function TokenCard({token_id, balance, sale_type, sale_id})

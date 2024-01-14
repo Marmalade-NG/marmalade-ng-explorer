@@ -32,4 +32,17 @@ const TokenRef = ({token}) => <Link to={"/token/"+token}>{token.substring(0,24)+
 const CopyTokenRef = ({token}) => <><TokenRef token={token} /><CopyButton fontsize={13} value={token} /> </>
 const CopyToken = ({token}) => <>{token.substring(0,24)+"..."} <CopyButton fontsize={13} value={token} /> </>
 
-export {CopyHeader, AccountRef, CopyToken, CopyAccountRef, CopyTokenRef, CopyLink, TransactionLink}
+
+function pretty_price(value, currency)
+{
+  const _currency = currency?
+                    currency=="coin"?"KDA":currency
+                    :"";
+
+  const _val = value?value.toFixed(2):"...";
+  return `${_val} ${_currency}`;
+}
+
+const Price = ({value, curr}) => <> {pretty_price(value, curr)} </>
+
+export {CopyHeader, AccountRef, CopyToken, CopyAccountRef, CopyTokenRef, CopyLink, TransactionLink, Price}

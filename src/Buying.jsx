@@ -1,7 +1,7 @@
 import {useState, useMemo, useEffect} from 'react'
 import YAML from 'yaml'
 import {Grid, Card, Label, Message, Form,  TextArea, Loader, Dimmer, Image, Container, Header, Segment, Button, Modal, Table } from 'semantic-ui-react'
-import {CopyHeader, CopyButton} from './Common.jsx'
+import {CopyHeader, CopyButton, Price} from './Common.jsx'
 import {TokenCard} from './TokenCards.jsx'
 import {useSale, usePrecision, useTokenSupply} from "./SWR_Hooks.js"
 import {m_client} from "./chainweb_marmalade_ng"
@@ -206,8 +206,6 @@ function SaleDetails({sale})
   const {precision} = usePrecision(sale['token-id']);
   const {supply} = useTokenSupply(sale['token-id']);
 
-  const currency = sale.currency=="coin"?"KDA":sale.currency;
-
   return  <Table celled>
             <Table.Body>
               <Table.Row>
@@ -216,7 +214,7 @@ function SaleDetails({sale})
               </Table.Row>
               <Table.Row>
                 <Table.Cell><Label color="blue" ribbon>Price</Label></Table.Cell>
-                <Table.Cell>{sale.price.toFixed(3)} {currency} </Table.Cell>
+                <Table.Cell> <Price value={sale?.price} curr={sale?.currency} /> </Table.Cell>
               </Table.Row>
             </Table.Body>
           </Table>
