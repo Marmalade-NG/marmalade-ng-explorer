@@ -3,6 +3,7 @@ import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, u
 import {Link} from 'react-router-dom';
 import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
+import {auction_next_price} from './marmalade_common.js'
 
 const BuyButton = ({link}) => <Button circular primary animated='vertical' as={Link} to={link}>
                                             <Button.Content visible>Buy</Button.Content>
@@ -21,11 +22,7 @@ function FixedSale({sale_id})
 function AuctionSale({sale_id})
 {
   const {sale} = useSale(sale_id, "a");
-
-  let price;
-  if(sale)
-    price = sale["current-price"].eq("0.0")?sale["start-price"]:sale["current-price"].mul(sale["increment-ratio"]);
-  return <><Label color="blue">For Sale (Auction) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label></>
+  return <><Label color="blue">For Sale (Auction) <br/> Price = <Price value={auction_next_price(sale)} curr={sale?.currency} /> </Label></>
 }
 
 function DutchAuctionSale({sale_id})

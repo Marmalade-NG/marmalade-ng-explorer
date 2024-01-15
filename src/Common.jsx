@@ -1,7 +1,7 @@
 import {Header, Icon, Popup} from 'semantic-ui-react'
 import {Link} from 'react-router-dom';
-
-import {useCallback} from 'react'
+import {useCallback} from 'react';
+import {pretty_price} from './marmalade_common.js';
 
 const EXPLORER = "https://explorer.chainweb.com/testnet"
 
@@ -31,17 +31,6 @@ const CopyAccountRef = ({account}) => <><AccountRef account={account} /><CopyBut
 const TokenRef = ({token}) => <Link to={"/token/"+token}>{token.substring(0,24)+"..."} </Link>
 const CopyTokenRef = ({token}) => <><TokenRef token={token} /><CopyButton fontsize={13} value={token} /> </>
 const CopyToken = ({token}) => <>{token.substring(0,24)+"..."} <CopyButton fontsize={13} value={token} /> </>
-
-
-function pretty_price(value, currency)
-{
-  const _currency = currency?
-                    currency=="coin"?"KDA":currency
-                    :"";
-
-  const _val = value?value.toFixed(2):"...";
-  return `${_val} ${_currency}`;
-}
 
 const Price = ({value, curr}) => <> {pretty_price(value, curr)} </>
 
