@@ -22,7 +22,10 @@ function FixedSale({sale_id})
 function AuctionSale({sale_id})
 {
   const {sale} = useSale(sale_id, "a");
-  return <><Label color="blue">For Sale (Auction) <br/> Price = <Price value={auction_next_price(sale)} curr={sale?.currency} /> </Label></>
+  return  <div style={{display:"flex"}}>
+            <Label color="blue">For Sale (Auction) <br/> Price = <Price value={auction_next_price(sale)} curr={sale?.currency} /> </Label>
+            <BuyButton link={"/buy/a/"+sale_id} />
+          </div>
 }
 
 function DutchAuctionSale({sale_id})
