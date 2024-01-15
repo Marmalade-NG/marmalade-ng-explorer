@@ -26,6 +26,13 @@ const get_guard = (x) => m_client.local_pact(`(coin.details "${x}")`)
 
 const dec = (x) => ({"decimal":x.toString()})
 
+function nonce()
+{
+  const a = new Uint8Array(8);
+  crypto.getRandomValues(a);
+  return "ng_expl:" + Array.from(a, (x)=>x.toString(16)).join('');
+}
+
 
 const make_trx = (sale, buyer, buyer_guard) => Pact.builder.continuation({pactId:sale['sale-id'], step:1, rollback:false})
                                                            .setMeta({sender:buyer, chainId:m_client.chain, gasLimit:10000})
@@ -34,6 +41,7 @@ const make_trx = (sale, buyer, buyer_guard) => Pact.builder.continuation({pactId
                                                            .addData("buyer-guard",buyer_guard)
                                                            .addSigner(buyer_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
                                                            .addSigner(buyer_guard.keys[0], (withCapability) => [withCapability('coin.TRANSFER', buyer, sale['escrow-account'], dec(sale.price))])
+                                                           .setNonce(nonce)
                                                            .createTransaction()
 
 
@@ -43,6 +51,7 @@ const make_bid_trx = (sale, buyer, buyer_guard, price) => Pact.builder.execution
                                                                       .addData("bg",buyer_guard)
                                                                       .addSigner(buyer_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
                                                                       .addSigner(buyer_guard.keys[0], (withCapability) => [withCapability('coin.TRANSFER', buyer, sale['escrow-account'], dec(price))])
+                                                                      .setNonce(nonce)
                                                                       .createTransaction()
 
 
