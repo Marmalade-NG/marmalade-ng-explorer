@@ -33,7 +33,7 @@ function DutchAuctionSale({sale_id})
   const {sale} = useSale(sale_id, "d");
   const {price} = useDutchPrice(sale?sale_id:null)
   return  <div style={{display:"flex"}}>
-            <Label color="blue">For Sale (Dutch A.) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label>
+            <Label color="olive">For Sale (Dutch A.) <br/> Price = <Price value={price} curr={sale?.currency} /> </Label>
             <BuyButton link={"/buy/d/"+sale_id} />
           </div>
 }
