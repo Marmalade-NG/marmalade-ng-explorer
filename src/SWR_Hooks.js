@@ -102,14 +102,14 @@ export function useTokenCollection(token_id)
 
 export function useOwners(token_id)
 {
-  const {data, error} = useSWR(token_id?["/owners", token_id]:null, ([, id]) => {return m_client.list_holders(id)},
+  const {data, error} = useSWR(token_id?["/listHolders", token_id]:null, x => {return m_client.batch(x)},
                                {fallbackData:[], refreshInterval: 181*1001})
   return {owners:data, error}
 }
 
 export function useAllCollections()
 {
-  const {data, error} = useSWR("/AllCollections", () => {return m_client.get_all_collections()},
+  const {data, error} = useSWR(["/allCollections", undefined], x => {return m_client.batch(x)},
                                {fallbackData:[],refreshInterval: 600*1002})
   if(error)
     console.warn(error);
@@ -118,7 +118,7 @@ export function useAllCollections()
 
 export function useTokensFromCollection(collection)
 {
-  const {data, error} = useSWR(["/CT", collection], ([, id]) => {return m_client.list_tokens_of_collection(id)},
+  const {data, error} = useSWR(["/listTokensCollection", collection], x => {return m_client.batch(x)},
                                {fallbackData:[],refreshInterval: 182*1003})
   return {tokens:data, error}
 }
@@ -192,7 +192,7 @@ export function useSales(account)
 
 export function useAccountBalances(account)
 {
-  const {data, error} = useSWR(["/account", account], ([,a]) => {return m_client.list_balances(a)},
+  const {data, error} = useSWR(["/listBalances", account], x => {return m_client.batch(x)},
                                {fallbackData:[],refreshInterval: 180000})
   return {balances:data, error}
 }

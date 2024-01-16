@@ -107,6 +107,7 @@ class MarmaladeNGClient
   #batch;
   #batch_defers;
   #batch_id;
+  #batch_multirows
 
   constructor(name, node, network, chain, namespace, bridge_namespace)
   {
@@ -149,10 +150,26 @@ class MarmaladeNGClient
                 "/bridgeSrc/GUARD":
                     {cmd: id => `(${this.policy_bridge_inbound_g_mint}.get-data "${id}")`,
                      post: ({source}) => source},
-                 "/tokenCollection":
+                "/tokenCollection":
                     {cmd: id => `{'c:(${this.policy_collection}.get-token-collection "${id}"),
                                   'r:(${this.policy_collection}.get-token-rank-in-collection "${id}")}`,
                      post: ({c,r}) => ({c:to_collection(c), r:to_int(r)})},
+                "/listTokensCollection":
+                    {cmd: id => `(${this.policy_collection}.list-tokens-of-collection "${id}")`,
+                    post: x =>x,
+                    multirows:true},
+                "/allCollections":
+                    {cmd: () => `(${this.policy_collection}.get-all-collections)`,
+                    post: x =>x,
+                    multirows:true},
+                "/listHolders":
+                    {cmd: id => `(${this.ledger}.list-holders "${id}")`,
+                     post: x => x.map(to_owned_balance),
+                     multirows:true},
+                "/listBalances":
+                    {cmd: id => `(${this.ledger}.list-balances "${id}")`,
+                     post: x => x.map(to_balance),
+                     multirows:true},
                  "/supply":
                     {cmd: id => `(${this.ledger}.total-supply "${id}")`,
                      post:to_dec},
@@ -206,6 +223,7 @@ class MarmaladeNGClient
     this.#batch = [];
     this.#batch_defers = [];
     this.#batch_id = null;
+    this.#batch_multirows = 0;
   }
 
 
@@ -213,9 +231,12 @@ class MarmaladeNGClient
   {
     const cmd = `[${this.#batch.join(",")}]`
     const defers = this.#batch_defers;
+    clearTimeout(this.#batch_id);
     this.#batch = [];
     this.#batch_defers = [];
     this.#batch_id = null;
+    this.#batch_multirows = 0;
+
     return this.local_pact(cmd)
                .then(results => {results.forEach((res, i) => {defers[i].resolve(res)})})
                .catch(error => {defers.forEach((defer) => {defer.reject(error)})})
@@ -224,7 +245,14 @@ class MarmaladeNGClient
 
   batch([swr_cmd, argument])
   {
-      const {cmd, post} = this.cmds[swr_cmd];
+      const {cmd, post, multirows} = this.cmds[swr_cmd];
+      if(multirows)
+      {
+        if(this.#batch_multirows == 3)
+          this.run_batch();
+        this.#batch_multirows += 1;
+      }
+
       const d = Deferred();
       this.#batch.push(cmd(argument))
       this.#batch_defers.push(d);
@@ -313,18 +341,6 @@ class MarmaladeNGClient
                .then(()=> cmd)
   }
 
-  list_holders(token_id)
-  {
-    return this.local_pact(`(${this.ledger}.list-holders "${token_id}")`)
-               .then((lst) => lst.map(to_owned_balance))
-  }
-
-  list_balances(account)
-  {
-    return this.local_pact(`(${this.ledger}.list-balances "${account}")`)
-               .then((lst) => lst.map(to_balance))
-  }
-
   list_sales(account_token)
   {
     let func_arg
@@ -339,16 +355,6 @@ class MarmaladeNGClient
                              'a:(${this.policy_auction_sale}.${func_arg}),
                              'd:(${this.policy_dutch_auction_sale}.${func_arg})}`)
           .then(({f, a, d}) => ({f:f.map(to_fixed_sale), a:a.map(to_auction_sale), d:d.map(to_dutch_auction_sale)}))
-  }
-
-  list_tokens_of_collection(collection_id)
-  {
-    return this.local_pact(`(${this.policy_collection}.list-tokens-of-collection "${collection_id}")`)
-  }
-
-  get_all_collections()
-  {
-      return this.local_pact(`(${this.policy_collection}.get-all-collections)`)
   }
 
   get_modules_hashes()
