@@ -56,6 +56,7 @@ function ExplorerMenu()
 
       <Dropdown item button text='Sales'>
         <Dropdown.Menu >
+          <Dropdown.Item as={Link} to='/sales/all'>All</Dropdown.Item>
           <Dropdown.Item as={Link} to='/sales/f'>Fixed price</Dropdown.Item>
           <Dropdown.Item as={Link} to='/sales/a'>Auctions</Dropdown.Item>
           <Dropdown.Item as={Link} to='/sales/d'>Dutch Auctions</Dropdown.Item>
