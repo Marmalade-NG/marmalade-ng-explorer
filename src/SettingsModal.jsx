@@ -33,8 +33,9 @@ function SettingsModal({trigger, onChange})
                             }
 
   const update_client = (new_client) => {set_client(new_client);
-                                         setCookies("instance", data, {expires:in_one_month()});
-                                         mutate( ([k,]) => k !== "/off-chain", undefined,{revalidate:true});
+                                         setCookies("instance", data, {expires:in_one_month(), sameSite:"strict"});
+                                         mutate(([k,]) => k=="/allCollections" || k=="/ListSales", undefined, {revalidate:true})
+                                         setTimeout(() =>  mutate( ([k,]) => (k != "/off-chain" && k !="/allCollections" && k!="/ListSales"), undefined,{revalidate:true}), 50)
                                          setOpen(false);
                                          onChange();
                                         }
