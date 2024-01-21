@@ -11,7 +11,7 @@ import {Sales} from './Sales.jsx';
 import {TokenView} from './Token.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
-import MARM_LOGO from './assets/marm_logo.png'
+import MARM_LOGO from './assets/marm_logo_shaded.png'
 import {set_client_from_data} from "./chainweb_marmalade_ng"
 import {INSTANCES} from './OnChainRefs.js';
 import {Buying} from './Buying.jsx';
