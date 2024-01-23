@@ -13,6 +13,10 @@ const HUNDRED = new Decimal("100")
 
 const to_percent = x => x!=null?(x.mul(HUNDRED).toFixed(2)+ "%"):"/"
 
+const NO_TIMEOUT = new Date("0000-01-01T00:00:00Z").getTime()
+
+const stringify_timeout = (x) => x.getTime()==NO_TIMEOUT?"No timeout (endless)":x.toString()
+
 function CommonSaleRows({sale})
 {
     const {precision} = usePrecision(sale?.["token-id"]);
@@ -50,7 +54,7 @@ function FixedSaleRows({sale})
               <Table.Cell> Price </Table.Cell><Table.Cell> {sale.price.toFixed(3)} </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell> Timeout (End)</Table.Cell><Table.Cell singleLine> {sale.timeout.toString()} </Table.Cell>
+              <Table.Cell> Timeout (End)</Table.Cell><Table.Cell singleLine> {stringify_timeout(sale.timeout)} </Table.Cell>
             </Table.Row>
           </>
 }
@@ -70,7 +74,7 @@ function AuctionSaleRows({sale})
               <Table.Cell> Best bidder </Table.Cell><Table.Cell> {sale["current-buyer"]?(<CopyAccountRef account={sale["current-buyer"]} />):"/"} </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell> Timeout (End) </Table.Cell><Table.Cell singleLine> {sale.timeout.toString()} </Table.Cell>
+              <Table.Cell> Timeout (End) </Table.Cell><Table.Cell singleLine> {stringify_timeout(sale.timeout)} </Table.Cell>
             </Table.Row>
           </>
 }
@@ -96,7 +100,7 @@ function DutchAuctionSaleRows({sale})
               <Table.Cell> Current price </Table.Cell><Table.Cell style={{backgroundColor:"Orchid"}}> {price?price.toFixed(3):"/"} </Table.Cell>
             </Table.Row>
             <Table.Row>
-              <Table.Cell> Timeout (End) </Table.Cell><Table.Cell singleLine> {sale.timeout.toString()} </Table.Cell>
+              <Table.Cell> Timeout (End) </Table.Cell><Table.Cell singleLine> {stringify_timeout(sale.timeout)} </Table.Cell>
             </Table.Row>
           </>
 }
