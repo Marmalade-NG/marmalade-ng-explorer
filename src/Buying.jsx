@@ -6,7 +6,7 @@ import {CopyHeader, CopyButton, Price} from './Common.jsx'
 import {TokenCard} from './TokenCards.jsx'
 import {useSale, usePrecision, useTokenSupply, useDutchPrice} from "./SWR_Hooks.js"
 import {m_client} from "./chainweb_marmalade_ng"
-import {auction_next_price} from './marmalade_common.js'
+import {auction_next_price, pretty_currency} from './marmalade_common.js'
 import {createEckoWalletQuicksign, signWithChainweaver} from '@kadena/client'
 import ECKO_LOGO from './assets/ecko-wallet-rounded.png';
 import CHAINWEAVER_LOGO from './assets/chainweaver-rounded.png';
@@ -126,7 +126,7 @@ function ChainWeaverDesktopCard({selected, onClick})
           </Card>
 }
 
-function WalletAccountManager({set_data})
+function WalletAccountManager({set_data, currency})
 {
   const [wallet, setWallet] = useState("")
   const [account, _setAccount] = useState("")
@@ -160,7 +160,8 @@ function WalletAccountManager({set_data})
               <input placeholder='Account' value={account} onChange={(e) => setAccount(e.target.value)} disabled={!wallet || wallet==="Ecko"} />
             </Form.Field>
 
-            {keyError && <Message negative header="Key Error" content={"Can't retrieve key: Missing account / Unsupported guard" } />}
+            {keyError && <Message negative header="Key Error" list={["Can't retrieve key: Missing account or Unsupported guard",
+                                                                     `Make sure yout have a ${pretty_currency(currency)} account on Chain ${m_client.settings.chain} (${m_client.settings.network})`] } />}
 
             <Form.Field error={keyError} >
               <label>PubKey:</label>
@@ -228,7 +229,7 @@ function BuyingForm({sale})
     // eslint-disable-next-line react-hooks/exhaustive-deps
                                     ?make_trx(sale, userData.account, userData.guard):null, [sale?.['sale-id'], userData])
   return  <Form>
-            <WalletAccountManager set_data={setUserData} />
+            <WalletAccountManager set_data={setUserData} currency={sale.currency} />
             <TransactionManager trx={transaction} signer={SIGNERS[userData?.wallet]} />
           </Form>
 }

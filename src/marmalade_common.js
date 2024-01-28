@@ -16,4 +16,4 @@ const pretty_value = (val) =>  val?val.toFixed(PRICE_DIGITS):"...";
 const pretty_price = (val, currency) =>  `${pretty_value(val)} ${pretty_currency(currency)}`;
 
 
-export {auction_next_price, pretty_price}
+export {auction_next_price, pretty_price, pretty_currency}
