@@ -68,6 +68,8 @@ function fetchData(uri)
 function useNFTdata(uri)
 {
   const {data, error} = useSWRImmutable(uri?["/off-chain", uri]:null, ([,v]) => fetchData(v));
+  if(error)
+    console.info(`${error.message}:${uri}`)
   return {data:data?data:(error?DEFAULT_MISSING:DEFAULT_DATA), error}
 }
 
