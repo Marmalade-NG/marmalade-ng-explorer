@@ -13,27 +13,34 @@ const GATEWAYS = [".dweb.link", "ipfs.io", ".nftstorage.link", "cloudflare-ipfs.
 
 const KDAFS_GATEWAY = "gw.marmalade-ng.xyz"
 
-const ipfs_resolution = (gw, cid) =>  "https://" + (gw.startsWith(".")?(cid + ".ipfs" + gw):(gw + "/ipfs/" + cid))
 
-const kdafs_resolution = (gw, cid) =>  "https://" + gw + "/kdafs/" + cid;
+const ipfs_resolution = (gw, cid, path) =>  "https://" + (gw.startsWith(".")?(cid + ".ipfs" + gw):(gw + "/ipfs/" + cid)) + "/" + (path??" ")
+
+const kdafs_resolution = (gw, cid, path) =>  "https://" + gw + "/kdafs/" + cid + "/" + path;
 
 const del_fetch = (d, sig, uri) => delay(d, {signal:sig})
                                    .then(() => fetch(uri))
 
 function _fetch(uri)
 {
-  const [protocol, _cid] = uri.split("//")
+  const [protocol, c_path] = uri.split("//")
+  if(!protocol || !c_path)
+    throw new Error(`Invalid URI:${uri}`);
+
+  const [cid, ..._path] = c_path.split("/");
+  const path = _path.join("/");
+
   if(protocol == "ipfs:")
   {
-    const cid = CID.parse(_cid).toV1().toString()
-    const ctr = new AbortController();
+    const norm_cid = CID.parse(cid).toV1().toString()
+    const ctr = new AbortController()
     /* Uncomment to round robin */
     /*GATEWAYS.push(GATEWAYS.shift());*/
-    return Promise.any(GATEWAYS.map((g, i) => del_fetch(i*2500, ctr.signal, ipfs_resolution(g, cid))))
+    return Promise.any(GATEWAYS.map((g, i) => del_fetch(i*2500, ctr.signal, ipfs_resolution(g, norm_cid, path))))
                   .then(x => {ctr.abort(); return x})
   }
   else if(protocol == "kdafs:")
-    return fetch(kdafs_resolution(KDAFS_GATEWAY, _cid))
+    return fetch(kdafs_resolution(KDAFS_GATEWAY, cid, path))
   else
     return fetch(uri);
 }
