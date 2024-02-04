@@ -10,10 +10,10 @@ import {CollectionsList} from './CollectionsLists.jsx';
 import {Sales} from './Sales.jsx';
 import {TokenView} from './Token.jsx';
 import { Link, useNavigate } from 'react-router-dom';
-import { useCookies } from 'react-cookie';
+import useLocalStorage from "use-local-storage";
 import MARM_LOGO from './assets/marm_logo_shaded.png'
 import {set_client_from_data} from "./chainweb_marmalade_ng"
-import {INSTANCES} from './OnChainRefs.js';
+import {DEFAULT_INSTANCE} from './OnChainRefs.js';
 import {Buying} from './Buying.jsx';
 
 
@@ -107,10 +107,9 @@ const Root = () => <CollectionsList />
 
 function App ()
 {
-  const [cookies] = useCookies([]);
-  const instance = cookies.instance ?? INSTANCES[import.meta.env.VITE_DEFAULT_INSTANCE];
-  set_client_from_data(instance);
 
+  const [stored_instace] = useLocalStorage("instance", DEFAULT_INSTANCE);
+  set_client_from_data(stored_instace);
 
   return <div>
     <ExplorerMenu />

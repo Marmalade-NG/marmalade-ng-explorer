@@ -32,3 +32,5 @@ const TESTNET_1 =
 export const INSTANCES = {"Mainnet Chain 8":MAINNET_8,
                           "Mainnet Chain 1":MAINNET_1,
                           "Testnet Chain 1":TESTNET_1}
+
+export const DEFAULT_INSTANCE = INSTANCES[import.meta.env.VITE_DEFAULT_INSTANCE];
