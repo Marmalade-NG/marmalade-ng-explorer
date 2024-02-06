@@ -1,7 +1,7 @@
 import {useNFTdata} from "./NFT_data.js"
 import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {Link} from 'react-router-dom';
-import {Container, Card, Image, Label, Button, Icon} from 'semantic-ui-react';
+import {Container, Card, Image, Label, Button, Icon, Segment} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
 import {auction_next_price} from './marmalade_common.js'
 
@@ -54,7 +54,7 @@ function TokenCard({token_id, balance, sale_type, sale_id})
             <Image src={img} />
             <Card.Content header={token_id.substring(0,12)} />
             <Card.Meta>
-              <Container size="tiny" style={{overflow: "hidden"}}>{uri}</Container>
+              <Segment basic size="small" style={{overflow: "hidden"}}>{uri}</Segment>
             </Card.Meta>
             {(balance && supply)? (<Card.Description >{balance.toFixed(1)} / {supply.toFixed(1)}</Card.Description>):""}
             <Card.Content extra>
