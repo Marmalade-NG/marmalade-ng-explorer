@@ -10,6 +10,8 @@ import { Link } from 'react-router-dom';
 
 import {List, Button, Modal, Container, Label, Grid, Header, Image, Icon, Radio, Table, Segment} from 'semantic-ui-react'
 import BRIDGE_ICON from './assets/bridge.svg'
+import REMOVED_IMG from './assets/removed.png'
+import {enabled_image} from './exclude.js'
 
 
 const COLLAPSED = () => false;
@@ -374,13 +376,13 @@ function TokenView({token_id})
   const {uri} = useTokenUri(token_id);
   const {data} = useNFTdata(uri);
   const {policies} = useTokenPolicies(token_id)
-
+  const img = enabled_image(token_id)?data.img:REMOVED_IMG;
 
   return  <Segment>
             <CopyHeader as="h1">{token_id}</CopyHeader>
             <Grid relaxed columns={2}>
               <Grid.Column width={5}>
-                <Image src={data.img} />
+                <Image src={img} />
 
                 <SupplySegment token_id={token_id} />
                 {policies.includes("COLLECTION") && <CollectionSegment token_id={token_id} />}

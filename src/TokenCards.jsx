@@ -4,6 +4,8 @@ import {Link} from 'react-router-dom';
 import {Card, Image, Label, Button, Icon, Segment} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
 import {auction_next_price} from './marmalade_common.js'
+import REMOVED_IMG from './assets/removed.png'
+import {enabled_image} from './exclude.js'
 
 const BuyButton = ({link}) => <Button circular primary animated='vertical' as={Link} to={link}>
                                             <Button.Content visible>Buy</Button.Content>
@@ -48,7 +50,8 @@ function TokenCard({token_id, balance, sale_type, sale_id})
 
   const {collection} = useTokenCollection(policies.includes("COLLECTION")?token_id:null);
 
-  const {img} = data;
+  const img = enabled_image(token_id)?data.img:REMOVED_IMG;
+
 
   return  <Card as={Link} to={"/token/"+token_id} raised style={{width:"250px", padding:"2px"}}>
             <Image src={img} />

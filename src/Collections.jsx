@@ -2,7 +2,7 @@ import {TokenCard} from './TokenCards.jsx'
 import {CopyHeader} from './Common.jsx'
 import {useTokensFromCollection, useCollection} from "./SWR_Hooks.js"
 import {Container, Card, Table, Segment} from 'semantic-ui-react'
-
+import {enabled_token} from './exclude.js'
 
 const ms_to_string = (x) => x==0?"Unlimited":x.toString()
 
@@ -36,7 +36,7 @@ function Collection({collection_id})
             </Segment>
             <Segment.Inline>
               <Card.Group>
-                {tokens.map( x => (<TokenCard key={x} token_id={x} />))}
+                {tokens.filter(enabled_token).map( x => (<TokenCard key={x} token_id={x} />))}
               </Card.Group>
             </Segment.Inline>
           </Container>
