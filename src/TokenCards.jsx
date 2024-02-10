@@ -1,7 +1,7 @@
 import {useNFTdata} from "./NFT_data.js"
 import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {Link} from 'react-router-dom';
-import {Container, Card, Image, Label, Button, Icon, Segment} from 'semantic-ui-react';
+import {Card, Image, Label, Button, Icon, Segment} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
 import {auction_next_price} from './marmalade_common.js'
 
