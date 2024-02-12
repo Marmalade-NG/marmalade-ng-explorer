@@ -113,7 +113,7 @@ function App ()
 
   return <div>
     <ExplorerMenu />
-    <Container style={{paddingTop:"100px"}}>
+    <Container style={{paddingTop:"100px", paddingBottom:"20px"}}>
       <Routes>
         <Route path="account/:account_ref" element={<AccountFromRoute />} />
         <Route path="collection/:collection_ref" element={<CollectionFromRoute />} />

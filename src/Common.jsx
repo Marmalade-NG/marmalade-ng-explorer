@@ -1,4 +1,4 @@
-import {Header, Icon, Popup} from 'semantic-ui-react'
+import {Header, Icon, Popup, Segment, Pagination} from 'semantic-ui-react'
 import {Link} from 'react-router-dom';
 import {useCallback} from 'react';
 import {pretty_price} from './marmalade_common.js';
@@ -34,4 +34,15 @@ const CopyToken = ({token}) => <>{token.substring(0,24)+"..."} <CopyButton fonts
 
 const Price = ({value, curr}) => <> {pretty_price(value, curr)} </>
 
-export {CopyHeader, AccountRef, CopyToken, CopyAccountRef, CopyTokenRef, CopyLink, TransactionLink, Price}
+
+const Paginator = ({current_page, total_pages, onChange}) => total_pages==1?""
+                                                             :(<Segment basic textAlign="center">
+                                                                <Pagination activePage={current_page} totalPages={total_pages} onPageChange={(e, target) => onChange(target.activePage)}
+                                                                            ellipsisItem={{ content: <Icon name='ellipsis horizontal' />, icon: true }}
+                                                                            firstItem={{ content: <Icon name='angle double left' />, icon: true }}
+                                                                            lastItem={{ content: <Icon name='angle double right' />, icon: true }}
+                                                                            prevItem={{ content: <Icon name='angle left' />, icon: true }}
+                                                                            nextItem={{ content: <Icon name='angle right' />, icon: true }}/>
+                                                             </Segment>)
+
+export {CopyHeader, AccountRef, CopyToken, CopyAccountRef, CopyTokenRef, CopyLink, TransactionLink, Price, Paginator}

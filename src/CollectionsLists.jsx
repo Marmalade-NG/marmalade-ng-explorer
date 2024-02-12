@@ -1,10 +1,13 @@
+import {useState} from 'react'
 import {useNFTdata} from "./NFT_data.js"
 import {Link} from 'react-router-dom';
 import {useTokenUri, useTokensFromCollection, useCollection, useAllCollections} from "./SWR_Hooks.js"
 import EMPTY_IMG from './assets/empty.png'
 import REMOVED_IMG from './assets/removed.png'
 import {Container, Card, Header, Image, Segment} from 'semantic-ui-react'
+import {CopyHeader, Paginator} from './Common.jsx'
 import {enabled_collection, enabled_image} from './exclude.js'
+import {paginate} from './pagination.js'
 
 
 function CollectionCard({collection_id})
@@ -31,18 +34,23 @@ function CollectionCard({collection_id})
 
 function CollectionsList()
 {
+  const [page, setPage] = useState(1);
   const {collections_list} = useAllCollections();
+  const {total_pages, current_page, selected} = paginate(collections_list.filter(enabled_collection), page)
+  const paginator = <Paginator current_page={current_page} total_pages={total_pages} onChange={setPage} />
 
   return <Container>
             <Segment color="purple" stacked compact>
               <Header> Collections List </Header>
             </Segment>
+            {paginator}
 
             <Segment.Inline>
               <Card.Group>
-                {collections_list.filter(enabled_collection).map((cid) => (<CollectionCard key={cid} collection_id={cid} />))}
+                {selected.map((cid) => (<CollectionCard key={cid} collection_id={cid} />))}
               </Card.Group>
             </Segment.Inline>
+            {paginator}
             </Container>
 }
 
