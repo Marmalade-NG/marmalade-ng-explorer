@@ -2,10 +2,15 @@ import {Header, Icon, Popup, Segment, Pagination} from 'semantic-ui-react'
 import {Link} from 'react-router-dom';
 import {useCallback} from 'react';
 import {pretty_price} from './marmalade_common.js';
+import {m_client} from "./chainweb_marmalade_ng"
 
-const EXPLORER = "https://explorer.chainweb.com/testnet"
+const EXPLORERS = {mainnet01: "https://explorer.chainweb.com/mainnet",
+                   testnet04: "https://explorer.chainweb.com/testnet",
+                  }
 
-const tx_detail = x => `${EXPLORER}/txdetail/${x}`
+const _tx_detail = (network, x) => EXPLORERS[network]?`${EXPLORERS[network]}/txdetail/${x}`:""
+
+const tx_detail = x => _tx_detail(m_client.network, x)
 
 export function CopyButton({value, fontsize=16})
 {
@@ -24,7 +29,7 @@ function CopyHeader({children, ...other})
 const CopyLink = ({val, onClick}) => <> <Link onClick={onClick}>{val}</Link> <CopyButton fontsize={13} value={val} /></>
 
 const TransactionLink = ({trx}) => <> <Link rel="noopener noreferrer" target="_blank" to={tx_detail(trx)}>{trx}</Link> <CopyButton fontsize={13} value={trx} /></>
-//const TransactionLink = ({trx}) => <> <Link rel="noopener noreferrer" target="_blank" to={tx_detail(trx)}>{trx}</Link> <CopyButton fontsize={13} value={trx} /></>
+
 const AccountRef = ({account}) => <Link to={"/account/"+account}>{account.substring(0,24)+"..."} </Link>
 const CopyAccountRef = ({account}) => <><AccountRef account={account} /><CopyButton fontsize={13} value={account} /> </>
 
