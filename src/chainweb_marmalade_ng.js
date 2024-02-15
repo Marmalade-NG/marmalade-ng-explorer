@@ -341,6 +341,13 @@ class MarmaladeNGClient
                .then(()=> cmd)
   }
 
+  status(cmd)
+  {
+    return this.#client.pollStatus({requestKey:cmd.hash, chainId: this.chain , networkId: this.network},
+                                   {timeout:1000*180, interval:5000})
+               .then(x=> x?.[cmd.hash]) 
+  }
+
   list_sales(account_token)
   {
     let func_arg

@@ -1,7 +1,7 @@
 import {useState, useMemo, useEffect, useCallback} from 'react'
 import YAML from 'yaml'
 import {Decimal} from 'decimal.js';
-import {Grid, Card, Label, Message, Form,  TextArea, Loader, Dimmer, Image, Container, Header, Segment, Button, Modal, Table } from 'semantic-ui-react'
+import {Grid, Icon, Card, Label, Message, Form,  TextArea, Loader, Dimmer, Image, Container, Header, Segment, Button, Modal, Table } from 'semantic-ui-react'
 import {CopyHeader, CopyButton, Price} from './Common.jsx'
 import {TokenCard} from './TokenCards.jsx'
 import {useSale, usePrecision, useTokenSupply, useDutchPrice} from "./SWR_Hooks.js"
@@ -171,6 +171,20 @@ function WalletAccountManager({set_data, currency})
 }
 
 
+function TransactionResult({result})
+{
+
+  const make_content = x => <Message.Content><Message.Header>On chain result</Message.Header>{x}</Message.Content>
+
+  if(!result)
+    return <Message header='On chain result' icon> <Icon name='circle notched' loading /> {make_content("Waiting for transaction being mined")} </Message>
+  if(result.status == "success")
+    return <Message header='On chain result' icon positive > <Icon name='thumbs up outline'/> {make_content(JSON.stringify(result))} </Message>
+  else
+    return <Message header='On chain result' icon negative > <Icon name='thumbs down outline'/> {make_content(JSON.stringify(result))} </Message>
+}
+
+
 
 function TransactionManager({trx, signer})
 {
@@ -178,12 +192,14 @@ function TransactionManager({trx, signer})
     const [localError, setLocalError] = useState(false);
     const [sigSendError, setSigSendError] = useState(null);
     const [successful, setSuccessful] = useState(false);
+    const [statusResult, setStatusResult] = useState(null);
     const [signatureModal, setSignatureModal] = useState(false);
 
     useEffect(() => { setLocalResult(null);
                       setLocalError(false);
                       setSigSendError(null);
                       setSuccessful(false);
+                      setStatusResult(null);
                       if(trx)
                       {
                         m_client.local_check(trx, {signatureVerification:false, preflight:false})
@@ -199,7 +215,8 @@ function TransactionManager({trx, signer})
                               signer(trx)
                               .then((t) => m_client.preflight(t))
                               .then((t) => m_client.send(t))
-                              .then(() => setSuccessful(true))
+                              .then(() => {setSuccessful(true), setStatusResult(null); return m_client.status(trx)
+                                                                                                      .then((x) => setStatusResult(x.result))})
                               .catch((x) => setSigSendError(x))
                             }
                             else
@@ -217,6 +234,7 @@ function TransactionManager({trx, signer})
               <SignatureModal trx={trx} open={signatureModal} onClose={() => setSignatureModal(false)} />
               {sigSendError && <Message negative header='Signature / Submit Error:' content={sigSendError.toString()} />}
               {successful && <Message positive header='Signature / Submit Result:' content="Transaction successfuly signed and submitted" />}
+              {successful && <TransactionResult result={statusResult} />}
             </>
 }
 
