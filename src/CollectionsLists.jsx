@@ -5,7 +5,7 @@ import {useTokenUri, useTokensFromCollection, useCollection, useAllCollections} 
 import EMPTY_IMG from './assets/empty.png'
 import REMOVED_IMG from './assets/removed.png'
 import {Container, Card, Header, Image, Segment} from 'semantic-ui-react'
-import {CopyHeader, Paginator} from './Common.jsx'
+import {Paginator} from './Common.jsx'
 import {enabled_collection, enabled_image} from './exclude.js'
 import {paginate} from './pagination.js'
 
