@@ -197,7 +197,7 @@ function BridgingSegment({token_id})
 
   const {src} = useBridgeSrc(IS_IN(bridging)?token_id:null, IN_TYPE(bridging));
 
-  const label_color = (x) => target_type(token_id,x)==="....."?"gray"
+  const label_color = (x) => target_type(token_id,x)==="....."?"grey"
                             :(target_type(token_id,x)==="Disabled"?"red":
                               "blue")
 
