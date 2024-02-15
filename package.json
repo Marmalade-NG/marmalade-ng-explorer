@@ -11,7 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@kadena/client": "1.7.0",
+    "@kadena/client": "1.8.1",
     "decimal.js": "^10.4.3",
     "delay": "^6.0.0",
     "fomantic-ui-css": "^2.9.0",
