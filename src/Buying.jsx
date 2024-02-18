@@ -2,7 +2,7 @@ import {useState, useMemo, useEffect, useCallback} from 'react'
 import YAML from 'yaml'
 import {Decimal} from 'decimal.js';
 import {Grid, Icon, Card, Label, Message, Form,  TextArea, Loader, Dimmer, Image, Container, Header, Segment, Button, Modal, Table } from 'semantic-ui-react'
-import {CopyHeader, CopyButton, Price} from './Common.jsx'
+import {CopyHeader, CopyButton, Price, TransactionLink} from './Common.jsx'
 import {TokenCard} from './TokenCards.jsx'
 import {useSale, usePrecision, useTokenSupply, useDutchPrice} from "./SWR_Hooks.js"
 import {m_client} from "./chainweb_marmalade_ng"
@@ -171,15 +171,20 @@ function WalletAccountManager({set_data, currency})
 }
 
 
-function TransactionResult({result})
+function TransactionResult({result, hash})
 {
 
   const make_content = x => <Message.Content><Message.Header>On chain result</Message.Header>{x}</Message.Content>
 
   if(!result)
-    return <Message header='On chain result' icon> <Icon name='circle notched' loading /> {make_content("Waiting for transaction being mined")} </Message>
+    return <Message header='On chain result' icon> <Icon name='circle notched' loading /> {make_content("Waiting for transaction confirmation")} </Message>
   if(result.status == "success")
-    return <Message header='On chain result' icon positive > <Icon name='thumbs up outline'/> {make_content(JSON.stringify(result))} </Message>
+    return  <Message header='On chain result' icon positive > <Icon name='thumbs up outline'/>
+              <Message.List>
+                <Message.Item> Transaction Result: {JSON.stringify(result)} </Message.Item>
+                <Message.Item> <TransactionLink trx={hash} /> </Message.Item>
+            </Message.List>
+  </Message>
   else
     return <Message header='On chain result' icon negative > <Icon name='thumbs down outline'/> {make_content(JSON.stringify(result))} </Message>
 }
@@ -234,7 +239,7 @@ function TransactionManager({trx, signer})
               <SignatureModal trx={trx} open={signatureModal} onClose={() => setSignatureModal(false)} />
               {sigSendError && <Message negative header='Signature / Submit Error:' content={sigSendError.toString()} />}
               {successful && <Message positive header='Signature / Submit Result:' content="Transaction successfuly signed and submitted" />}
-              {successful && <TransactionResult result={statusResult} />}
+              {successful && <TransactionResult result={statusResult} hash={trx?.hash} />}
             </>
 }
 
@@ -333,7 +338,7 @@ function Buying({sale_id, sale_type})
   const {price} = useDutchPrice(sale_type=="d"?sale_id:null)
   if(sale && sale_type == "d" && price)
     sale.price = price.toDecimalPlaces(2, Decimal.ROUND_UP);
-    
+
   return <Container>
             <Segment color="purple" stacked compact>
               <Header as="h1"> {TITLES[sale_type]}  </Header>
