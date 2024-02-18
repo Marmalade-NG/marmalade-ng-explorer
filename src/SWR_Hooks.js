@@ -34,7 +34,7 @@ export function usePrecision(token_id)
 export function useSale(sale_id, sale_type)
 {
   const {data, error} = useSWR(sale_id?["/sale_"+sale_type, sale_id]:null, x => {return m_client.batch(x)},
-                               {refreshInterval: 60*1000})
+                               {refreshInterval: 600*1000, revalidateOnFocus:false})
   return {sale:data, error}
 }
 
@@ -184,7 +184,7 @@ export function useDutchPrice(sale_id)
 export function useSales(account)
 {
   const {data, error} = useSWR(["/ListSales", account], ([,a]) => {return m_client.list_sales(a)},
-                               {fallbackData:{f:[], a:[], d:[]}, refreshInterval: 180000})
+                               {fallbackData:{f:[], a:[], d:[]}, refreshInterval: 180*1000})
   if(error)
     console.warn(error);
   return {sales:data, error}
@@ -193,6 +193,6 @@ export function useSales(account)
 export function useAccountBalances(account)
 {
   const {data, error} = useSWR(["/listBalances", account], x => {return m_client.batch(x)},
-                               {fallbackData:[],refreshInterval: 180000})
+                               {fallbackData:[],refreshInterval: 180*1000})
   return {balances:data, error}
 }
