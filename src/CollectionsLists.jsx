@@ -18,7 +18,7 @@ function CollectionCard({collection_id})
   const {data} = useNFTdata(first_uri);
 
   const img = data?(enabled_image(tokens[0])
-                    ?data.img:REMOVED_IMG)
+                    ?data.thumbnail:REMOVED_IMG)
                   :EMPTY_IMG;
 
   return  <Card raised style={{width:"250px", padding:"2px"}}>

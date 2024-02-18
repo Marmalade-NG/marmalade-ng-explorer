@@ -50,7 +50,7 @@ function TokenCard({token_id, balance, sale_type, sale_id})
 
   const {collection} = useTokenCollection(policies.includes("COLLECTION")?token_id:null);
 
-  const img = enabled_image(token_id)?data.img:REMOVED_IMG;
+  const img = enabled_image(token_id)?data.thumbnail:REMOVED_IMG;
 
 
   return  <Card as={Link} to={"/token/"+token_id} raised style={{width:"250px", padding:"2px"}}>

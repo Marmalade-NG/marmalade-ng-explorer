@@ -1,10 +1,12 @@
 import {useState, useEffect} from 'react'
 import { useSWRConfig } from "swr"
-import { Button, Modal, Form, Message } from 'semantic-ui-react'
+import { Button, Modal, Form, Message, Divider } from 'semantic-ui-react'
 import useLocalStorage from "use-local-storage";
 import {CopyButton} from './Common.jsx';
 import {MarmaladeNGClient, m_client, set_client} from "./chainweb_marmalade_ng"
 import {INSTANCES} from './OnChainRefs.js'
+import {Link} from 'react-router-dom';
+import {clear as idb_clear} from 'idb-keyval';
 
 
 function SettingsModal({trigger, onChange})
@@ -43,6 +45,11 @@ function SettingsModal({trigger, onChange})
                                       .catch(() => setPactError(true))
                                       .finally(() => setIsLoading(false));
                          }
+
+  const clean_img_cache = (e) => {e.preventDefault();
+                                  idb_clear()
+                                  .then(mutate(([k,]) => k == "/off-chain" , undefined, {revalidate:true}))
+                                 }
 
   useEffect( () => {_setData(m_client.settings); setPactError(false);setIsLoading(false)}, [open])
 
@@ -91,7 +98,8 @@ function SettingsModal({trigger, onChange})
               </Form>
 
             {pactError && <Message error header='Marmalade NG Error' content='Modules not found' />}
-
+            <Divider />
+            <Link to="#" onClick={clean_img_cache}> Clear images cache... </Link>
             </Modal.Content>
 
             <Modal.Actions>

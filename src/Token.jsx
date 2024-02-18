@@ -376,13 +376,14 @@ function TokenView({token_id})
   const {uri} = useTokenUri(token_id);
   const {data} = useNFTdata(uri);
   const {policies} = useTokenPolicies(token_id)
-  const img = enabled_image(token_id)?data.img:REMOVED_IMG;
+  const img = enabled_image(token_id)?data.thumbnail:REMOVED_IMG;
+
 
   return  <Segment>
             <CopyHeader as="h1">{token_id}</CopyHeader>
             <Grid relaxed columns={2}>
               <Grid.Column width={5}>
-                <Image src={img} />
+                <Image src={img} as={Link} to={data.img_link} target='_blank'/>
 
                 <SupplySegment token_id={token_id} />
                 {policies.includes("COLLECTION") && <CollectionSegment token_id={token_id} />}
