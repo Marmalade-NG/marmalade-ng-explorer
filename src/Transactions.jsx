@@ -181,7 +181,7 @@ function TransactionManager({trx, wallet})
                       if(trx)
                       {
                         m_client.local_check(trx, {signatureVerification:false, preflight:false})
-                                .then(setLocalResult)
+                                .then((e) =>{setLocalResult(e); setLocalError(false)})
                                 .catch((e)=>{setLocalResult(e); setLocalError(true)})
                       }
                     },[trx]);
