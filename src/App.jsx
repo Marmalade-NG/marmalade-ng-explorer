@@ -1,7 +1,7 @@
 import {useCallback, useReducer} from 'react'
 import {m_client} from "./chainweb_marmalade_ng";
 import {version} from './version.js';
-import { Routes, Route, useParams } from 'react-router-dom';
+import { Routes, Route, useParams, Navigate } from 'react-router-dom';
 import {Account} from './Account.jsx';
 import {Collection} from './Collections.jsx';
 import {InfoModal} from "./InfoModal.jsx"
@@ -15,6 +15,7 @@ import MARM_LOGO from './assets/marm_logo_shaded.png'
 import {set_client_from_data} from "./chainweb_marmalade_ng"
 import {DEFAULT_INSTANCE} from './OnChainRefs.js';
 import {Buying} from './Buying.jsx';
+import {Selling} from './Selling.jsx';
 
 
 import 'fomantic-ui-css/semantic.min.css'
@@ -103,6 +104,14 @@ function TokenFromRoute ()
   return <TokenView token_id={token_ref} />
 }
 
+function SellFromRoute ()
+{
+  const {token_ref} = useParams()
+  return (import.meta.env.VITE_SALES_ENABLED == "true")? <Selling token_id={token_ref} />
+                                                       : <Navigate to={`/token/${token_ref}`} replace={true} />
+}
+
+
 const Root = () => <CollectionsList />
 
 function App ()
@@ -120,6 +129,7 @@ function App ()
         <Route path="collections" element={<CollectionsList />} />
         <Route path="sales/:sale_type" element={<SalesFromRoute />} />
         <Route path="buy/:sale_type/:sale_id" element={<BuyFromRoute />} />
+        <Route path="sell/:token_ref" element={<SellFromRoute />} />
         <Route path="token/:token_ref" element={<TokenFromRoute />} />
         <Route path="" element={<Root />} />
       </Routes>

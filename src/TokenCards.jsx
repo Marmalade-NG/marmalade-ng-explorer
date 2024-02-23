@@ -12,6 +12,17 @@ const BuyButton = ({link}) => <Button circular primary animated='vertical' as={L
                                             <Button.Content hidden> <Icon name='shop' /> </Button.Content>
                                           </Button>
 
+const SellButton = ({link}) => <Button circular color="violet" animated='vertical' as={Link} to={link}>
+                                            <Button.Content visible>Sell this token</Button.Content>
+                                            <Button.Content hidden> <Icon name='shop' /> </Button.Content>
+                                          </Button>
+
+const SellFixture = ({token_id}) =>  <div style={{textAlign:"center"}} >
+                                      <SellButton link={"/sell/"+token_id} />
+                                    </div>
+
+
+
 function FixedSale({sale_id})
 {
   const {sale} = useSale(sale_id, "f");
@@ -41,7 +52,7 @@ function DutchAuctionSale({sale_id})
 }
 
 
-function TokenCard({token_id, balance, sale_type, sale_id})
+function TokenCard({token_id, balance, sale_type, sale_id, can_sell})
 {
   const {uri} = useTokenUri(token_id);
   const {data} = useNFTdata(uri);
@@ -67,6 +78,7 @@ function TokenCard({token_id, balance, sale_type, sale_id})
             {sale_type==="f"?(<Card.Content extra><FixedSale sale_id={sale_id} /></Card.Content>):""}
             {sale_type==="a"?(<Card.Content extra><AuctionSale sale_id={sale_id} /></Card.Content>):""}
             {sale_type==="d"?(<Card.Content extra><DutchAuctionSale sale_id={sale_id} /></Card.Content>):""}
+            {can_sell && import.meta.env.VITE_SALES_ENABLED == "true" && <SellFixture token_id={token_id} />}
           </Card>
 }
 

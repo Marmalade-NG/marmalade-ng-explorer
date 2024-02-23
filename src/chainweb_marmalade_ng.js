@@ -138,6 +138,9 @@ class MarmaladeNGClient
                 "/bridging":
                     {cmd: id => `(${this.br_std_polices}.from-bridging-policies (${this.ledger}.get-policies "${id}"))`,
                      post: x => x},
+                "/balance":
+                    {cmd: ([id, account]) => `(${this.ledger}.get-balance "${id}" "${account}")`,
+                     post: to_dec},
                 "/bridgeDst":
                     {cmd: id => `(${this.policy_bridge_outbound}.get-data "${id}")`,
                      post: ({dest}) => dest},
