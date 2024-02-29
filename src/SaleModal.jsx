@@ -1,6 +1,7 @@
 import {usePrecision, useDutchPrice, useRoyalty, useMarketPlace, useAdjustableRoyaltyRate, useTokenPolicies} from "./SWR_Hooks.js"
 import {Header, Modal, Table} from 'semantic-ui-react'
 import {CopyAccountRef, CopyToken, TransactionLink} from './Common.jsx'
+import {is_no_timeout} from './marmalade_common.js';
 import Decimal from 'decimal.js';
 
 const TITLES = {a:"Auction sale",
@@ -13,9 +14,7 @@ const HUNDRED = new Decimal("100")
 
 const to_percent = x => x!=null?(x.mul(HUNDRED).toFixed(2)+ "%"):"/"
 
-const NO_TIMEOUT = new Date("0000-01-01T00:00:00Z").getTime()
-
-const stringify_timeout = (x) => x.getTime()==NO_TIMEOUT?"No timeout (endless)":x.toString()
+const stringify_timeout = (x) => is_no_timeout(x)?"No timeout (endless)":x.toString()
 
 function CommonSaleRows({sale})
 {
