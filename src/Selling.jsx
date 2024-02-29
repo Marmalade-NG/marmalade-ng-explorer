@@ -1,13 +1,15 @@
-import {useTokenPolicies, useTokenBalance, useTokenSupply, usePrecision} from "./SWR_Hooks.js"
+import {useTokenPolicies, useTokenBalance, useTokenSupply, usePrecision, useRoyalty} from "./SWR_Hooks.js"
 import {useState, useMemo, useEffect} from 'react'
 import {TransactionManager,  WalletAccountManager} from './Transactions';
-import {Card, Grid, Image, Label, Message, Form, Container, Header, Segment, Radio } from 'semantic-ui-react'
+import {Card, Grid, Image, Label, Message, Form, Container, Header, Segment, Radio, Modal, Button, Table } from 'semantic-ui-react'
 import {Pact} from '@kadena/client'
 import {m_client} from "./chainweb_marmalade_ng"
 import Decimal from 'decimal.js';
+import {Link} from 'react-router-dom';
 import {TokenCard} from './TokenCards'
 import {make_nonce} from './transactions_common';
 import {CopyHeader} from './Common'
+import {pretty_price} from './marmalade_common.js';
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
@@ -23,6 +25,9 @@ const coin_fungible = {refSpec: [{namespace:null, name:"fungible-v2"}],
 const timep = x => x?{timep:x.toISOString()}:null
 
 const ZERO = Decimal("0")
+const ONE = Decimal("1")
+const HUNDRED = Decimal("100")
+const to_percent = x => x.mul(HUNDRED).toFixed(1) + "%"
 
 const dec = (x) => ({"decimal":x.toString()})
 
@@ -159,6 +164,107 @@ function DecimalPriceField({name, onChange, disabled, error})
 
 
 const DateWarningMessage = ({date}) => (date  && date>warning_date())?(<Message visible warning header="Are you sure? The choosen time is long time in the future" content="Your token will be locked until that date"/>):"";
+
+
+function useRoyaltyRate(token_id)
+{
+    const {policies} = useTokenPolicies(token_id);
+    const has_cst_royalty = policies.includes("ROYALTY");
+    const has_adj_royalty = policies.includes("ADJUSTABLE-ROYALTY");
+    const has_royalty = has_cst_royalty || has_adj_royalty;
+
+    const {royalty} = useRoyalty(has_royalty?token_id:null, has_adj_royalty);
+
+    return royalty?royalty.rate:ZERO;
+}
+
+function FeeDetailsModal({headers, gross, fees, total})
+{
+  const [open, setOpen] = useState(false)
+
+/* eslint-disable react/jsx-key */
+  return  <Modal size="tiny" onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open} trigger={<Link>Details</Link>} >
+            <Modal.Header>Fees details</Modal.Header>
+            <Modal.Content>
+            <Table celled>
+
+              <Table.Header>
+                <Table.Row>
+                  <Table.HeaderCell collapsing/>
+                  {headers.map( x=> (<Table.HeaderCell> {x} </Table.HeaderCell> ))}
+                </Table.Row>
+              </Table.Header>
+
+              <Table.Row positive>
+                <Table.Cell> Gross&nbsp;price </Table.Cell>
+                {gross.map( x=> (<Table.Cell> {x} </Table.Cell> ))}
+              </Table.Row>
+
+              {fees.map(fee_line => <Table.Row negative> {fee_line.map(x => <Table.Cell>{x}</Table.Cell>)}</Table.Row>) }
+
+              <Table.Footer>
+                <Table.Row>
+                  <Table.HeaderCell> Total </Table.HeaderCell>
+                    {total.map( x=> (<Table.HeaderCell> {x} </Table.HeaderCell> ))}
+                </Table.Row>
+              </Table.Footer>
+
+            </Table>
+            </Modal.Content>
+            <Modal.Actions>
+              <Button color='black' onClick={() => setOpen(false)}> Close</Button>
+            </Modal.Actions>
+          </Modal>
+/* eslint-enable react/jsx-key */
+}
+
+function FixedPriceNet({sale_data, token_id})
+{
+  const royalty_rate = useRoyaltyRate(token_id);
+  const gross = sale_data?.price??ZERO;
+  const fees = royalty_rate.mul(gross)
+  const total = gross.sub(fees)
+
+  const details = <FeeDetailsModal headers={["Fixed"]} gross={[pretty_price(gross, "coin")]}
+                                                       fees={[["Royalty", "- " + pretty_price(fees, "coin")]]}
+                                                       total={[pretty_price(total, "coin")]}/>
+
+  return sale_data? <Message icon="info" header={`You will receive ${pretty_price(total, "coin")}`}
+                             content={details} />:""
+}
+
+function AuctionPriceNet({sale_data, token_id})
+{
+  const royalty_rate = useRoyaltyRate(token_id);
+  const gross = sale_data?.start_price??ZERO;
+  const fees = royalty_rate.mul(gross)
+  const total = gross.sub(fees)
+
+  const details = <FeeDetailsModal headers={["Start price", "End price"]}
+                                   gross={[pretty_price(gross, "coin"), "X" ]}
+                                   fees={[["Royalty", "- " + pretty_price(fees, "coin"), "- X * " + to_percent(royalty_rate)]]}
+                                   total={[pretty_price(total, "coin"), "X * " + to_percent(ONE.sub(royalty_rate))]}/>
+
+  return sale_data? <Message icon="info" header={`You will receive at least ${pretty_price(total, "coin")}`}
+                             content={details} />:""
+}
+
+
+function DutchAuctionPriceNet({sale_data, token_id})
+{
+  const royalty_rate = useRoyaltyRate(token_id);
+  const gross = sale_data?[sale_data.start_price, sale_data.end_price]:[ZERO, ZERO];
+  const fees = gross.map(g => royalty_rate.mul(g))
+  const total = fees.map((f, i)=> gross[i].sub(f))
+
+  const details = <FeeDetailsModal headers={["Max", "Min"]}
+                                   gross={gross.map(x=> pretty_price(x, "coin"))}
+                                   fees={[["Royalty"].concat(fees.map(x => "- " + pretty_price(x, "coin")))]}
+                                   total={total.map(x=> pretty_price(x, "coin"))}/>
+
+
+  return sale_data? <Message icon="info" header={`You will receive betwenn ${pretty_price(total[1], "coin")} and ${pretty_price(total[0], "coin")}`}  content={details}  />:""
+}
 
 function FixedPriceSellForm({disabled, onChange})
 {
@@ -308,9 +414,15 @@ function SellForm({token_id})
             </Form.Field>
 
             {has_balance && <SaleChoice token_id={token_id} onSelect={setSelectedSale} />}
-            {selectedSale == "FIXED-SALE" && has_balance && <FixedPriceSellForm onChange={setData} /> }
-            {selectedSale == "DUTCH-AUCTION-SALE" && has_balance && <DutchAuctionSellForm onChange={setData} /> }
-            {selectedSale == "AUCTION-SALE" && has_balance && <AuctionSellForm onChange={setData} /> }
+            {selectedSale == "FIXED-SALE" && has_balance && <><FixedPriceSellForm onChange={setData} />
+                                                              <FixedPriceNet sale_data={data} token_id={token_id}/></>}
+
+            {selectedSale == "DUTCH-AUCTION-SALE" && has_balance && <><DutchAuctionSellForm onChange={setData} />
+                                                                      <DutchAuctionPriceNet sale_data={data} token_id={token_id}/></>}
+
+
+            {selectedSale == "AUCTION-SALE" && has_balance && <> <AuctionSellForm onChange={setData} />
+                                                                 <AuctionPriceNet sale_data={data} token_id={token_id}/></>}
           <TransactionManager trx={trx} wallet={userData?.wallet} />
           </Form>
 }
