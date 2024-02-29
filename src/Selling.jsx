@@ -114,7 +114,7 @@ function default_sale(policies)
     return "FIXED-SALE";
   if(has_auction(policies))
     return "AUCTION-SALE";
-  if(has_dutch_auction(polcies))
+  if(has_dutch_auction(policies))
     return "DUTCH-AUCTION-SALE";
   return "UNDEF"
 }
