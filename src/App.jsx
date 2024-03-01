@@ -16,6 +16,7 @@ import {set_client_from_data} from "./chainweb_marmalade_ng"
 import {DEFAULT_INSTANCE} from './OnChainRefs.js';
 import {Buying} from './Buying.jsx';
 import {Selling} from './Selling.jsx';
+import {Ending} from './Ending.jsx';
 
 
 import 'fomantic-ui-css/semantic.min.css'
@@ -111,6 +112,12 @@ function SellFromRoute ()
                                                        : <Navigate to={`/token/${token_ref}`} replace={true} />
 }
 
+function EndFromRoute ()
+{
+  const {sale_id, sale_type} = useParams()
+  return <Ending sale_id={sale_id} sale_type={sale_type} />
+}
+
 
 const Root = () => <CollectionsList />
 
@@ -130,6 +137,7 @@ function App ()
         <Route path="sales/:sale_type" element={<SalesFromRoute />} />
         <Route path="buy/:sale_type/:sale_id" element={<BuyFromRoute />} />
         <Route path="sell/:token_ref" element={<SellFromRoute />} />
+        <Route path="end/:sale_type/:sale_id" element={<EndFromRoute />} />
         <Route path="token/:token_ref" element={<TokenFromRoute />} />
         <Route path="" element={<Root />} />
       </Routes>

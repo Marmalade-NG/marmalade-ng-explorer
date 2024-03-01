@@ -7,7 +7,7 @@ import {SaleModal} from './SaleModal.jsx'
 import { JsonView, collapseAllNested,defaultStyles } from 'react-json-view-lite';
 import 'react-json-view-lite/dist/index.css';
 import { Link } from 'react-router-dom';
-
+import {is_no_timeout} from './marmalade_common.js';
 import {List, Button, Modal, Container, Label, Grid, Header, Image, Icon, Radio, Table, Segment} from 'semantic-ui-react'
 import BRIDGE_ICON from './assets/bridge.svg'
 import REMOVED_IMG from './assets/removed.png'
@@ -92,11 +92,14 @@ function CommonSaleRow({sale, sale_type})
   const [saleModalOpen, setSaleModalOpen] = useState(false)
   const sale_id = sale["sale-id"]
   const buy_link = ["", "buy", sale_type, sale_id].join("/")
+  const can_end = is_no_timeout(sale.timeout) || sale.timeout <= new Date();
+  const end_link = ["", "end", sale_type, sale_id].join("/")
 
   return <>
           <Table.Row style={{backgroundColor:"MistyRose"}}>
             <Table.Cell colSpan={5} textAlign="center"><b>Sale ID: </b> <CopyLink val={sale_id} onClick={()=>setSaleModalOpen(true)} />
               <Button size="tiny" circular primary as={Link} to={buy_link}> Buy </Button>
+              {can_end && <Button size="tiny" circular secondary as={Link} to={end_link}> Close sale </Button> }
             </Table.Cell>
           </Table.Row>
           <SaleModal open={saleModalOpen} onClose={()=>setSaleModalOpen(false)} sale={sale}  />
