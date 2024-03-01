@@ -16,8 +16,6 @@ import 'react-datepicker/dist/react-datepicker.css'
 import SALES_A_IMG from './assets/sales_a.png'
 import SALES_F_IMG from './assets/sales_f.png'
 import SALES_D_IMG from './assets/sales_d.png'
-import ECKO_LOGO from './assets/ecko-wallet-rounded.png';
-
 
 const coin_fungible = {refSpec: [{namespace:null, name:"fungible-v2"}],
                        refName: {namespace:null, name: "coin"}}
@@ -311,7 +309,7 @@ function AuctionSellForm({disabled, onChange})
 
   useEffect( () => { if(startingPrice)
                         onChange({start_price:startingPrice, increment:increment, tout: toDate});
-                   },[startingPrice, increment, toDate])
+                   },[startingPrice, increment, toDate, onChange])
 
   return  <>
           <Grid celled>
@@ -348,7 +346,7 @@ function DutchAuctionSellForm({disabled, onChange})
 
   useEffect( () => { if(startingPrice && endPrice && startingPrice > endPrice && endSlopeDate < toDate)
                         onChange({start_price:startingPrice, end_price:endPrice, end_date: endSlopeDate, tout: toDate});
-                   },[endPrice, startingPrice, endSlopeDate, toDate])
+                   },[endPrice, startingPrice, endSlopeDate, toDate, onChange])
 
   const price_error = endPrice && startingPrice && startingPrice.lt(endPrice)
   const date_error = toDate < endSlopeDate
@@ -402,7 +400,7 @@ function SellForm({token_id})
   const setSelectedSale = x => {_setSelectedSale(x); setData(null)};
 
   const trx = useMemo( ()=> (userData && data && selectedSale)?MAKE_TRX[selectedSale](token_id, balance, userData.account, userData.guard, data):null,
-                      [userData,data, selectedSale])
+                      [userData,data, selectedSale, token_id, balance])
 
   const has_balance = balance && !balance.eq(ZERO)
 
