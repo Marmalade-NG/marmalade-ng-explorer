@@ -5,7 +5,7 @@
       "marketplace-account": "k:2e04bc04a9cf96701a806110242aee08a1692437413bead299fffb4a5b2e4bb6",
       "currency": {"refSpec":[{"namespace":null,"name":"fungible-v2"}],"refName":{"namespace":null,"name":"coin"}},
       "min-fee": 0.0001,
-      "fee-rate": 0.02,
+      "fee-rate": 0.025,
       "max-fee": 10.0,
       "shared-rate": 0.0
     },
