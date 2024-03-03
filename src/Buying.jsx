@@ -35,6 +35,8 @@ const make_bid_trx = (sale, buyer, buyer_guard, price) => Pact.builder.execution
 
 
 
+const warning_date = () => new Date(Date.now() + 30 * 86400 * 1000)
+
 
 function BuyingForm({sale})
 {
@@ -48,6 +50,14 @@ function BuyingForm({sale})
             <WalletAccountManager set_data={setUserData} currency={sale.currency} />
             <TransactionManager trx={transaction} wallet={userData?.wallet} />
           </Form>
+}
+
+function EndOfSaleMessage({sale})
+{
+  if(sale.timeout > warning_date())
+    return <Message color='red' header="Warning => Auction will end in a long time" list={[sale.timeout.toString(), "Your funds may be locked until that date"]} />
+  else
+    return <Message color='violet' header="Auction End" list={[sale.timeout.toString()]} />
 }
 
 function BidForm({sale})
@@ -69,6 +79,7 @@ function BidForm({sale})
                                     ?make_bid_trx(sale, userData.account, userData.guard, Decimal(bidAmount)):null, [sale?.['sale-id'], userData, bidAmount, amountError])
   return  <Form>
             <WalletAccountManager set_data={setUserData} />
+            <EndOfSaleMessage sale={sale} />
             <Form.Field error={amountError}>
               <label>Bid amount: Min: <Price value={auction_next_price(sale)} curr={sale?.currency} /> </label>
               <input placeholder='BidAmount' value={bidAmount.toString()} onChange={(e) => setBidAmount(e.target.value)}  />
