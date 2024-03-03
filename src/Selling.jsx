@@ -31,7 +31,7 @@ const to_percent = x => x.mul(HUNDRED).toFixed(1) + "%"
 const dec = (x) => ({"decimal":x.toString()})
 
 const make_trx_fixed = (token_id, amount, seller, seller_guard, fee, {tout, price}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
-                                                                                      .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
+                                                                                      .setMeta({sender:seller, chainId:m_client.chain, gasLimit:4000})
                                                                                       .setNetworkId(m_client.network)
                                                                                       .addData("tout", timep(tout))
                                                                                       .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)
@@ -43,7 +43,7 @@ const make_trx_fixed = (token_id, amount, seller, seller_guard, fee, {tout, pric
                                                                                       .createTransaction()
 
 const make_trx_dutch = (token_id, amount, seller, seller_guard, fee, {start_price, end_price, end_date, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
-                                                                                                                 .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
+                                                                                                                 .setMeta({sender:seller, chainId:m_client.chain, gasLimit:4000})
                                                                                                                  .setNetworkId(m_client.network)
                                                                                                                  .addData("tout", timep(tout))
                                                                                                                  .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)
@@ -55,7 +55,7 @@ const make_trx_dutch = (token_id, amount, seller, seller_guard, fee, {start_pric
                                                                                                                  .createTransaction()
 
 const make_trx_auction = (token_id, amount, seller, seller_guard, fee, {start_price, increment, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} (read-msg 'tout))`)
-                                                                                                          .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
+                                                                                                          .setMeta({sender:seller, chainId:m_client.chain, gasLimit:4000})
                                                                                                           .setNetworkId(m_client.network)
                                                                                                           .addData("tout", timep(tout))
                                                                                                           .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)

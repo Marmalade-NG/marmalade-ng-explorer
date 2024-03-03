@@ -11,14 +11,14 @@ import {CopyHeader} from './Common'
 
 
 const make_trx_withdraw_timed_out = (sale, gas_payer, user_guard) => Pact.builder.continuation({pactId:sale['sale-id'], step:0, rollback:true})
-                                                                                 .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:10000})
+                                                                                 .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:3500})
                                                                                  .setNetworkId(m_client.network)
                                                                                  .addSigner(user_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
                                                                                  .setNonce(make_nonce)
                                                                                  .createTransaction()
 
 const make_trx_withdraw_forced_fixed = (sale, gas_payer, user_guard) => Pact.builder.continuation({pactId:sale['sale-id'], step:0, rollback:true})
-                                                                                    .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:10000})
+                                                                                    .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:3500})
                                                                                     .setNetworkId(m_client.network)
                                                                                     .addSigner(user_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
                                                                                     .addSigner(user_guard.keys[0], (withCapability) => [withCapability(`${m_client.policy_fixed_sale}.FORCE-WITHDRAW`, sale['sale-id']) ])
@@ -26,7 +26,7 @@ const make_trx_withdraw_forced_fixed = (sale, gas_payer, user_guard) => Pact.bui
                                                                                     .createTransaction()
 
 const make_trx_withdraw_forced_dutch = (sale, gas_payer, user_guard) => Pact.builder.continuation({pactId:sale['sale-id'], step:0, rollback:true})
-                                                                                    .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:10000})
+                                                                                    .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:3500})
                                                                                     .setNetworkId(m_client.network)
                                                                                     .addSigner(user_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
                                                                                     .addSigner(user_guard.keys[0], (withCapability) => [withCapability(`${m_client.policy_dutch_auction_sale}.FORCE-WITHDRAW`, sale['sale-id']) ])
@@ -34,7 +34,7 @@ const make_trx_withdraw_forced_dutch = (sale, gas_payer, user_guard) => Pact.bui
                                                                                     .createTransaction()
 
 const make_trx_end_auction = (sale, gas_payer, user_guard,buyer, buyer_guard) => Pact.builder.continuation({pactId:sale['sale-id'], step:1, rollback:false})
-                                                                                             .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:10000})
+                                                                                             .setMeta({sender:gas_payer, chainId:m_client.chain, gasLimit:4000})
                                                                                              .setNetworkId(m_client.network)
                                                                                              .addData("buyer-guard",buyer_guard)
                                                                                              .addData("buyer",buyer)
