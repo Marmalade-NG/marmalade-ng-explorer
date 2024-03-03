@@ -9,7 +9,8 @@ import {Link} from 'react-router-dom';
 import {TokenCard} from './TokenCards'
 import {make_nonce} from './transactions_common';
 import {CopyHeader} from './Common'
-import {pretty_price} from './marmalade_common.js';
+import {pretty_price, compute_marketplace_fees} from './marmalade_common.js';
+import fees from '../config/fees.json';
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 
@@ -29,10 +30,11 @@ const to_percent = x => x.mul(HUNDRED).toFixed(1) + "%"
 
 const dec = (x) => ({"decimal":x.toString()})
 
-const make_trx_fixed = (token_id, amount, seller, seller_guard, {tout, price}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
+const make_trx_fixed = (token_id, amount, seller, seller_guard, fee, {tout, price}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
                                                                                       .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
                                                                                       .setNetworkId(m_client.network)
                                                                                       .addData("tout", timep(tout))
+                                                                                      .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)
                                                                                       .addData(`marmalade_sale_${token_id}`,{sale_type:"fixed", currency:coin_fungible})
                                                                                       .addData(`marmalade_fixed_quote_${token_id}`,{price:dec(price), recipient:seller})
                                                                                       .addSigner(seller_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
@@ -40,10 +42,11 @@ const make_trx_fixed = (token_id, amount, seller, seller_guard, {tout, price}) =
                                                                                       .setNonce(make_nonce)
                                                                                       .createTransaction()
 
-const make_trx_dutch = (token_id, amount, seller, seller_guard, {start_price, end_price, end_date, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
+const make_trx_dutch = (token_id, amount, seller, seller_guard, fee, {start_price, end_price, end_date, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
                                                                                                                  .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
                                                                                                                  .setNetworkId(m_client.network)
                                                                                                                  .addData("tout", timep(tout))
+                                                                                                                 .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)
                                                                                                                  .addData(`marmalade_sale_${token_id}`,{sale_type:"dutch_auction", currency:coin_fungible})
                                                                                                                  .addData(`marmalade_dutch_quote_${token_id}`,{start_price:dec(start_price), end_price:dec(end_price), end_time:timep(end_date), recipient:seller})
                                                                                                                  .addSigner(seller_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
@@ -51,16 +54,17 @@ const make_trx_dutch = (token_id, amount, seller, seller_guard, {start_price, en
                                                                                                                  .setNonce(make_nonce)
                                                                                                                  .createTransaction()
 
-const make_trx_auction = (token_id, amount, seller, seller_guard, {start_price, increment, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} (read-msg 'tout))`)
-                                                                                                                 .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
-                                                                                                                 .setNetworkId(m_client.network)
-                                                                                                                 .addData("tout", timep(tout))
-                                                                                                                 .addData(`marmalade_sale_${token_id}`,{sale_type:"auction", currency:coin_fungible})
-                                                                                                                 .addData(`marmalade_auction_${token_id}`,{start_price:dec(start_price), increment_ratio:dec(increment), recipient:seller})
-                                                                                                                 .addSigner(seller_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
-                                                                                                                 .addSigner(seller_guard.keys[0], (withCapability) => [withCapability(`${m_client.ledger}.OFFER`, token_id, seller, dec(amount))])
-                                                                                                                 .setNonce(make_nonce)
-                                                                                                                 .createTransaction()
+const make_trx_auction = (token_id, amount, seller, seller_guard, fee, {start_price, increment, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} (read-msg 'tout))`)
+                                                                                                          .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
+                                                                                                          .setNetworkId(m_client.network)
+                                                                                                          .addData("tout", timep(tout))
+                                                                                                          .addData(`marmalade_marketplace_${token_id}`, fee?fee:undefined)
+                                                                                                          .addData(`marmalade_sale_${token_id}`,{sale_type:"auction", currency:coin_fungible})
+                                                                                                          .addData(`marmalade_auction_${token_id}`,{start_price:dec(start_price), increment_ratio:dec(increment), recipient:seller})
+                                                                                                          .addSigner(seller_guard.keys[0], (withCapability) => [withCapability('coin.GAS')])
+                                                                                                          .addSigner(seller_guard.keys[0], (withCapability) => [withCapability(`${m_client.ledger}.OFFER`, token_id, seller, dec(amount))])
+                                                                                                          .setNonce(make_nonce)
+                                                                                                          .createTransaction()
 
 const MAKE_TRX = {"FIXED-SALE":make_trx_fixed, "DUTCH-AUCTION-SALE":make_trx_dutch, "AUCTION-SALE":make_trx_auction}
 
@@ -237,48 +241,65 @@ function FeeDetailsModal({headers, gross, fees, total})
 /* eslint-enable react/jsx-key */
 }
 
-function FixedPriceNet({sale_data, token_id})
+function FixedPriceNet({sale_data, token_id, fee})
 {
   const royalty_rate = useRoyaltyRate(token_id);
   const gross = sale_data?.price??ZERO;
-  const fees = royalty_rate.mul(gross)
-  const total = gross.sub(fees)
+  const mplace_fee = compute_marketplace_fees(gross, fee);
+  const gross_after_mplace = gross.sub(mplace_fee);
+
+  const royalty = royalty_rate.mul(gross_after_mplace)
+  const total = gross_after_mplace.sub(royalty)
 
   const details = <FeeDetailsModal headers={["Fixed"]} gross={[pretty_price(gross, "coin")]}
-                                                       fees={[["Royalty", "- " + pretty_price(fees, "coin")]]}
+                                                       fees={[["Marketplace", "- " + pretty_price(mplace_fee, "coin")],
+                                                              ["Royalty", "- " + pretty_price(royalty, "coin")]]}
                                                        total={[pretty_price(total, "coin")]}/>
 
   return sale_data? <Message icon="info" header={`You will receive ${pretty_price(total, "coin")}`}
                              content={details} />:""
 }
 
-function AuctionPriceNet({sale_data, token_id})
+function AuctionPriceNet({sale_data, token_id, fee})
 {
   const royalty_rate = useRoyaltyRate(token_id);
   const gross = sale_data?.start_price??ZERO;
-  const fees = royalty_rate.mul(gross)
-  const total = gross.sub(fees)
+  const mplace_fee = compute_marketplace_fees(gross, fee);
+  const gross_after_mplace = gross.sub(mplace_fee);
+  const royalty = royalty_rate.mul(gross_after_mplace);
+  const total = gross_after_mplace.sub(royalty);
+
+  const mplace_fee_rate = fee?Decimal(fee["fee-rate"]):ZERO;
+  const mplace_fee_max = fee?Decimal(fee["max-fee"]):ZERO;
+
+  const mplace_string = fee?`- X * ${to_percent(mplace_fee_rate)} (Max : ${pretty_price(mplace_fee_max, "coin")})`:pretty_price(ZERO,"coin");
 
   const details = <FeeDetailsModal headers={["Start price", "End price"]}
                                    gross={[pretty_price(gross, "coin"), "X" ]}
-                                   fees={[["Royalty", "- " + pretty_price(fees, "coin"), "- X * " + to_percent(royalty_rate)]]}
-                                   total={[pretty_price(total, "coin"), "X * " + to_percent(ONE.sub(royalty_rate))]}/>
+                                   fees={[["MarketPlace", "- " + pretty_price(mplace_fee, "coin"), mplace_string],
+                                          ["Royalty", "- " + pretty_price(royalty, "coin"), "- X * " + to_percent(royalty_rate.mul(ONE.sub(mplace_fee_rate)))]]}
+                                   total={[pretty_price(total, "coin"), "X * " + to_percent(ONE.sub(royalty_rate).mul(ONE.sub(mplace_fee_rate)))]}/>
 
   return sale_data? <Message icon="info" header={`You will receive at least ${pretty_price(total, "coin")}`}
                              content={details} />:""
 }
 
 
-function DutchAuctionPriceNet({sale_data, token_id})
+function DutchAuctionPriceNet({sale_data, token_id, fee})
 {
   const royalty_rate = useRoyaltyRate(token_id);
   const gross = sale_data?[sale_data.start_price, sale_data.end_price]:[ZERO, ZERO];
-  const fees = gross.map(g => royalty_rate.mul(g))
-  const total = fees.map((f, i)=> gross[i].sub(f))
+
+  const mplace_fee = gross.map(x => compute_marketplace_fees(x, fee));
+  const gross_after_mplace = mplace_fee.map((f, i)=> gross[i].sub(f))
+
+  const royalty = gross_after_mplace.map(g => royalty_rate.mul(g))
+  const total = royalty.map((f, i)=> gross_after_mplace[i].sub(f))
 
   const details = <FeeDetailsModal headers={["Max", "Min"]}
                                    gross={gross.map(x=> pretty_price(x, "coin"))}
-                                   fees={[["Royalty"].concat(fees.map(x => "- " + pretty_price(x, "coin")))]}
+                                   fees={[["Marketplace"].concat(mplace_fee.map(x => "- " + pretty_price(x, "coin"))),
+                                          ["Royalty"].concat(royalty.map(x => "- " + pretty_price(x, "coin")))]}
                                    total={total.map(x=> pretty_price(x, "coin"))}/>
 
 
@@ -396,6 +417,12 @@ function DutchAuctionSellForm({disabled, onChange})
 }
 
 
+function useFee(token_id)
+{
+  const {policies} = useTokenPolicies(token_id);
+  return (policies && policies.includes("MARKETPLACE"))?fees[m_client.network]:undefined;
+}
+
 function SellForm({token_id})
 {
   const [userData, setUserData] = useState(null);
@@ -404,12 +431,11 @@ function SellForm({token_id})
   const {precision} = usePrecision(token_id);
   const {supply} = useTokenSupply(token_id);
   const {balance} = useTokenBalance(token_id, userData?.account)
-
-
+  const fee = useFee(token_id);
   const setSelectedSale = x => {_setSelectedSale(x); setData(null)};
 
-  const trx = useMemo( ()=> (userData && data && selectedSale)?MAKE_TRX[selectedSale](token_id, balance, userData.account, userData.guard, data):null,
-                      [userData,data, selectedSale, token_id, balance])
+  const trx = useMemo( ()=> (userData && data && selectedSale)?MAKE_TRX[selectedSale](token_id, balance, userData.account, userData.guard, fee, data):null,
+                      [userData,data, selectedSale, token_id, balance, fee])
 
   const has_balance = balance && !balance.eq(ZERO)
 
@@ -422,14 +448,14 @@ function SellForm({token_id})
 
             {has_balance && <SaleChoice token_id={token_id} onSelect={setSelectedSale} />}
             {selectedSale == "FIXED-SALE" && has_balance && <><FixedPriceSellForm onChange={setData} />
-                                                              <FixedPriceNet sale_data={data} token_id={token_id}/></>}
+                                                              <FixedPriceNet sale_data={data} token_id={token_id} fee={fee}/></>}
 
             {selectedSale == "DUTCH-AUCTION-SALE" && has_balance && <><DutchAuctionSellForm onChange={setData} />
-                                                                      <DutchAuctionPriceNet sale_data={data} token_id={token_id}/></>}
+                                                                      <DutchAuctionPriceNet sale_data={data} token_id={token_id} fee={fee} /></>}
 
 
             {selectedSale == "AUCTION-SALE" && has_balance && <> <AuctionSellForm onChange={setData} />
-                                                                 <AuctionPriceNet sale_data={data} token_id={token_id}/></>}
+                                                                 <AuctionPriceNet sale_data={data} token_id={token_id} fee={fee} /></>}
           <TransactionManager trx={trx} wallet={userData?.wallet} />
           </Form>
 }
