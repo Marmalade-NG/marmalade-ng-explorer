@@ -19,7 +19,8 @@ const stringify_timeout = (x) => is_no_timeout(x)?"No timeout (endless)":x.toStr
 function CommonSaleRows({sale})
 {
     const {precision} = usePrecision(sale?.["token-id"]);
-    return <> <Table.Row active>
+    return  <>
+              <Table.Row active>
                 <Table.Cell colSpan={2} textAlign="center" > {TITLES[sale.type]} </Table.Cell>
               </Table.Row>
               <Table.Row>
@@ -49,7 +50,8 @@ function CommonSaleRows({sale})
 
 function FixedSaleRows({sale})
 {
-  return <> <Table.Row>
+  return  <>
+            <Table.Row>
               <Table.Cell> Price </Table.Cell><Table.Cell> {sale.price.toFixed(3)} </Table.Cell>
             </Table.Row>
             <Table.Row>
@@ -60,7 +62,8 @@ function FixedSaleRows({sale})
 
 function AuctionSaleRows({sale})
 {
-  return <> <Table.Row>
+  return  <>
+            <Table.Row>
               <Table.Cell> Start price </Table.Cell><Table.Cell> {sale["start-price"].toFixed(3)} </Table.Cell>
             </Table.Row>
             <Table.Row>
@@ -83,7 +86,8 @@ function DutchAuctionSaleRows({sale})
 {
   const {price} = useDutchPrice(sale["sale-id"])
 
-  return <> <Table.Row>
+  return  <>
+            <Table.Row>
               <Table.Cell> Start price </Table.Cell><Table.Cell> {sale["start-price"].toFixed(3)} </Table.Cell>
             </Table.Row>
             <Table.Row>
@@ -107,7 +111,8 @@ function DutchAuctionSaleRows({sale})
 function RoyaltyRows({sale})
 {
   const {royalty} = useRoyalty(sale["token-id"]);
-  return <> <Table.Row active>
+  return  <>
+            <Table.Row active>
               <Table.Cell colSpan={2} textAlign="center" > Royalty </Table.Cell>
             </Table.Row>
             <Table.Row>
@@ -123,7 +128,8 @@ function AdjustableRoyaltyRows({sale})
 {
   const {royalty} = useRoyalty(sale["token-id"], true);
   const {rate} = useAdjustableRoyaltyRate(sale["sale-id"])
-  return <> <Table.Row active>
+  return  <>
+            <Table.Row active>
               <Table.Cell colSpan={2} textAlign="center" > Adjustable Royalty </Table.Cell>
             </Table.Row>
             <Table.Row>
@@ -179,21 +185,18 @@ function SaleModal({sale, open, onClose})
            <Header icon="exchange" textAlign="center" content={_sale?.["sale-id"]}/>
            <Modal.Content scrolling>
            <Table columns={1} collapsing celled striped>
-           {_sale && <CommonSaleRows sale={_sale} />}
-           {_sale?.type=="f" && <FixedSaleRows sale={_sale} />}
-           {_sale?.type=="d" && <DutchAuctionSaleRows sale={_sale} />}
-           {_sale?.type=="a" && <AuctionSaleRows sale={_sale} />}
-           {policies.includes("ROYALTY") && <RoyaltyRows sale={_sale} />}
-           {policies.includes("ADJUSTABLE-ROYALTY") && <AdjustableRoyaltyRows sale={_sale} />}
-           {policies.includes("MARKETPLACE") && <MarketPlaceRows sale={_sale} />}
+            <Table.Body>
+              {_sale && <CommonSaleRows sale={_sale} />}
+              {_sale?.type=="f" && <FixedSaleRows sale={_sale} />}
+              {_sale?.type=="d" && <DutchAuctionSaleRows sale={_sale} />}
+              {_sale?.type=="a" && <AuctionSaleRows sale={_sale} />}
+              {policies.includes("ROYALTY") && <RoyaltyRows sale={_sale} />}
+              {policies.includes("ADJUSTABLE-ROYALTY") && <AdjustableRoyaltyRows sale={_sale} />}
+              {policies.includes("MARKETPLACE") && <MarketPlaceRows sale={_sale} />}
+            </Table.Body>
            </Table>
            </Modal.Content>
          </Modal>
-/*  {
-
-
-}*/
-
 }
 
 export {SaleModal}

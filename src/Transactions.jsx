@@ -145,19 +145,25 @@ function WalletAccountManager({set_data, currency})
 function TransactionResult({result, hash})
 {
 
-  const make_content = x => <Message.Content><Message.Header>On chain result</Message.Header>{x}</Message.Content>
+  const make_content = x => <Message.Content>
+                              <Message.Header>On chain result</Message.Header>
+                              {x}
+                            </Message.Content>
 
   if(!result)
-    return <Message header='On chain result' icon> <Icon name='circle notched' loading /> {make_content("Waiting for transaction confirmation")} </Message>
+    return <Message icon> <Icon name='circle notched' loading /> {make_content("Waiting for transaction confirmation")} </Message>
   if(result.status == "success")
-    return  <Message header='On chain result' icon positive > <Icon name='thumbs up outline'/>
-              <Message.List>
-                <Message.Item> Transaction Result: {JSON.stringify(result)} </Message.Item>
-                <Message.Item> <TransactionLink trx={hash} /> </Message.Item>
-            </Message.List>
-  </Message>
+    return  <Message icon positive > <Icon name='thumbs up outline'/>
+              <Message.Content>
+                <Message.Header> On chain result </Message.Header>
+                  <Message.List>
+                    <Message.Item> Transaction Result: {JSON.stringify(result)} </Message.Item>
+                    <Message.Item> <TransactionLink trx={hash} /> </Message.Item>
+                  </Message.List>
+              </Message.Content>
+            </Message>
   else
-    return <Message header='On chain result' icon negative > <Icon name='thumbs down outline'/> {make_content(JSON.stringify(result))} </Message>
+    return <Message icon negative > <Icon name='thumbs down outline'/> {make_content(JSON.stringify(result))} </Message>
 }
 
 

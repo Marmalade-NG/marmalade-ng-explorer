@@ -134,8 +134,9 @@ function SaleChoice({token_id, onSelect})
 
   const setSelected = x => {_setSelected(x); onSelect(x)}
 
-  if(!selected && policies)
-    setSelected(default_sale(policies));
+  useEffect( () => { if(policies)
+                      setSelected(default_sale(policies));
+                   }, [policies])
 
   return <Card.Group itemsPerRow={3}>
             {has_fixed(policies) && <FixedPriceCard onClick={() => setSelected("FIXED-SALE")} selected={selected=="FIXED-SALE"} /> }
@@ -217,13 +218,14 @@ function FeeDetailsModal({headers, gross, fees, total})
                   {headers.map( x=> (<Table.HeaderCell> {x} </Table.HeaderCell> ))}
                 </Table.Row>
               </Table.Header>
+              <Table.Body>
+                <Table.Row positive>
+                  <Table.Cell> Gross&nbsp;price </Table.Cell>
+                  {gross.map( x=> (<Table.Cell> {x} </Table.Cell> ))}
+                </Table.Row>
 
-              <Table.Row positive>
-                <Table.Cell> Gross&nbsp;price </Table.Cell>
-                {gross.map( x=> (<Table.Cell> {x} </Table.Cell> ))}
-              </Table.Row>
-
-              {fees.map(fee_line => <Table.Row negative> {fee_line.map(x => <Table.Cell>{x}</Table.Cell>)}</Table.Row>) }
+                {fees.map(fee_line => <Table.Row negative>{fee_line.map(x => <Table.Cell>{x}</Table.Cell>)}</Table.Row>) }
+              </Table.Body>
 
               <Table.Footer>
                 <Table.Row>
@@ -328,20 +330,21 @@ function FixedPriceSellForm({disabled, onChange})
           </>
 }
 
-const INCREMENT_OPTIONS = [ {text:"10%", value:Decimal("1.1")},
-                            {text:"20%", value:Decimal("1.2")},
-                            {text:"50%", value:Decimal("1.5")},
-                            {text:"100%", value:Decimal("2.0")}]
+const INCREMENT_OPTIONS = [ {text:"10%", value:"1.1"},
+                            {text:"20%", value:"1.2"},
+                            {text:"50%", value:"1.5"},
+                            {text:"100%", value:"2.0"}]
 
+const DEFAULT_OPTION = INCREMENT_OPTIONS[0].value;
 
 function AuctionSellForm({disabled, onChange})
 {
   const [startingPrice, setStartingPrice] = useState(null)
-  const [increment, setIncrement] = useState(INCREMENT_OPTIONS[0].value)
+  const [increment, setIncrement] = useState(DEFAULT_OPTION)
   const [toDate, setToDate] = useState(base_date())
 
   useEffect( () => { if(startingPrice)
-                        onChange({start_price:startingPrice, increment:increment, tout: toDate});
+                        onChange({start_price:startingPrice, increment:Decimal(increment), tout: toDate});
                    },[startingPrice, increment, toDate, onChange])
 
   return  <>
