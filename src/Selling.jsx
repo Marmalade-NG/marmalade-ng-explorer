@@ -40,7 +40,7 @@ const make_trx_fixed = (token_id, amount, seller, seller_guard, {tout, price}) =
                                                                                       .setNonce(make_nonce)
                                                                                       .createTransaction()
 
-const make_trx_dutch = (token_id, amount, seller, seller_guard, {start_price, end_price, end_date, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} (read-msg 'tout))`)
+const make_trx_dutch = (token_id, amount, seller, seller_guard, {start_price, end_price, end_date, tout}) => Pact.builder.execution(`(${m_client.ledger}.sale "${token_id}" "${seller}" ${amount.toFixed(6)} ${tout?"(read-msg 'tout)":`${m_client.ledger}.NO-TIMEOUT`})`)
                                                                                                                  .setMeta({sender:seller, chainId:m_client.chain, gasLimit:10000})
                                                                                                                  .setNetworkId(m_client.network)
                                                                                                                  .addData("tout", timep(tout))
@@ -138,6 +138,27 @@ function SaleChoice({token_id, onSelect})
             {has_auction(policies) && <AuctionCard onClick={() => setSelected("AUCTION-SALE")} selected={selected=="AUCTION-SALE"} /> }
             {has_dutch_auction(policies) && <DutchAuctionCard onClick={() => setSelected("DUTCH-AUCTION-SALE")} selected={selected=="DUTCH-AUCTION-SALE"} /> }
             </Card.Group>
+}
+
+function NoTimeoutDatePicker({value, onChange, disabled})
+{
+  const is_no_timeout = value == null;
+  const [lastDate, setLastDate] = useState(base_date());
+
+  const setNoTimeout = x=> { if(x)
+                              {onChange(null);setLastDate(value)}
+                             else
+                              {onChange(lastDate)}
+                            }
+  return  <>
+            <Form.Field disabled={disabled}>
+              <Radio toggle label='Unlimited sale' checked={is_no_timeout} onChange={(e,t) => setNoTimeout(t.checked)} />
+            </Form.Field>
+            <Form.Field disabled={is_no_timeout || disabled}>
+              <label>End date</label>
+              <DatePicker  showTimeSelect selected={value} onChange={date => onChange(date)} dateFormat="Pp"/>
+            </Form.Field>
+          </>
 }
 
 function DecimalPriceField({name, onChange, disabled, error})
@@ -268,11 +289,8 @@ function FixedPriceSellForm({disabled, onChange})
 {
   const [price, _setPrice] = useState(null)
   const [toDate, _setToDate] = useState(base_date())
-  const [noTimeout, _setNoTimeout] = useState(false)
-
-  const setPrice = x => {_setPrice(x); if(x) {onChange({price:x, tout:noTimeout?null:toDate})}}
-  const setToDate = x => {_setToDate(x); if(price) {onChange({price:price, tout:noTimeout?null:x})}}
-  const setNoTimeout = x => {_setNoTimeout(x); if(price) {onChange({price:price, tout:x?null:toDate})}}
+  const setPrice = x => {_setPrice(x); if(x) {onChange({price:x, tout:toDate})}}
+  const setToDate = x => {_setToDate(x); if(price) {onChange({price:price, tout:x})}}
 
   return  <>
           <Grid celled>
@@ -281,13 +299,7 @@ function FixedPriceSellForm({disabled, onChange})
                 <DecimalPriceField name="Sell price" disabled={disabled} onChange={setPrice} />
               </Grid.Column>
               <Grid.Column width={9}>
-                  <Form.Field disabled={disabled}>
-                    <Radio toggle label='Unlimited sale' checked={noTimeout} onChange={(e,t) => setNoTimeout(t.checked)} />
-                  </Form.Field>
-                  <Form.Field disabled={noTimeout || disabled}>
-                    <label>End date</label>
-                    <DatePicker  showTimeSelect selected={toDate} onChange={date => setToDate(date)} dateFormat="Pp"/>
-                  </Form.Field>
+                <NoTimeoutDatePicker value={toDate} onChange={setToDate} />
               </Grid.Column>
             </Grid.Row>
           </Grid>
@@ -344,15 +356,15 @@ function DutchAuctionSellForm({disabled, onChange})
   const [endSlopeDate, setEndOfSlopeDate] = useState(base_date())
   const [toDate, setToDate] = useState(base_date_2())
 
-  useEffect( () => { if(startingPrice && endPrice && startingPrice > endPrice && endSlopeDate < toDate)
+  const price_error = endPrice && startingPrice && startingPrice.lt(endPrice)
+  const date_error = toDate!=null && (toDate < endSlopeDate);
+
+  useEffect( () => { if(startingPrice && endPrice && endPrice.lt(startingPrice) && (toDate== null || (toDate >= endSlopeDate)))
                         onChange({start_price:startingPrice, end_price:endPrice, end_date: endSlopeDate, tout: toDate});
                    },[endPrice, startingPrice, endSlopeDate, toDate, onChange])
 
-  const price_error = endPrice && startingPrice && startingPrice.lt(endPrice)
-  const date_error = toDate < endSlopeDate
-
   return  <>
-          <Grid>
+          <Grid celled>
             <Grid.Row>
               <Grid.Column width={7}>
                 <DecimalPriceField name="Starting price" disabled={disabled} onChange={setStartingPrice} error={price_error}/>
@@ -375,10 +387,7 @@ function DutchAuctionSellForm({disabled, onChange})
               <Grid.Column width={7} />
 
               <Grid.Column width={9}>
-                  <Form.Field disabled={disabled} error={date_error}>
-                    <label>End date</label>
-                    <DatePicker  showTimeSelect selected={toDate} onChange={date => setToDate(date)} dateFormat="Pp"/>
-                  </Form.Field>
+                <NoTimeoutDatePicker value={toDate} onChange={setToDate} />
               </Grid.Column>
             </Grid.Row>
           </Grid>
