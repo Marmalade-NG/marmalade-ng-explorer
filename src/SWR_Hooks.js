@@ -34,7 +34,7 @@ export function usePrecision(token_id)
 export function useTokenBalance(token_id, account)
 {
   const {data, error} = useSWR((token_id && account)?["/balance", [token_id, account]]:null, x => {return m_client.batch(x)},
-                               {refreshInterval: 600*1000, revalidateOnFocus:false})
+                               {revalidateOnFocus:false})
   if(error)
     console.warn(error);
   return {balance:data, error}
