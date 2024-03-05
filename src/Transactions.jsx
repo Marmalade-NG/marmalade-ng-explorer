@@ -168,7 +168,7 @@ function TransactionResult({result, hash})
 
 
 
-function TransactionManager({trx, wallet})
+function TransactionManager({trx, wallet, onConfirm})
 {
     const [localResult, setLocalResult] = useState(null);
     const [localError, setLocalError] = useState(false);
@@ -199,8 +199,9 @@ function TransactionManager({trx, wallet})
                               signer(trx)
                               .then((t) => m_client.preflight(t))
                               .then((t) => m_client.send(t))
-                              .then(() => {setSuccessful(true), setStatusResult(null); return m_client.status(trx)
-                                                                                                      .then((x) => setStatusResult(x.result))})
+                              .then(() => {setSuccessful(true), setStatusResult(null); return m_client.status(trx).then((x) => {setStatusResult(x.result);
+                                                                                                                                if(onConfirm)
+                                                                                                                                  onConfirm();})})
                               .catch((x) => setSigSendError(x))
                             }
                             else

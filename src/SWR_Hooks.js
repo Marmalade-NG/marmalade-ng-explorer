@@ -1,5 +1,6 @@
 import {m_client} from "./chainweb_marmalade_ng"
 import useSWR from 'swr';
+import { mutate } from "swr"
 import useSWRImmutable from 'swr/immutable'
 
 export function useModuleHashes(enabled)
@@ -222,6 +223,12 @@ export function useAllSales()
       data_d.forEach(__append);
 
     return {sales_map, error}
+}
+
+export function clear_sales()
+{
+  console.log("Reload sales");
+  mutate(([k,]) => k.startsWith("/allSales") , undefined, {revalidate:true})
 }
 
 export function useSalesForAccount(account)

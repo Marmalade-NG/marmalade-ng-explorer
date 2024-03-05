@@ -1,4 +1,4 @@
-import {useTokenPolicies, useTokenBalance, useTokenSupply, usePrecision, useRoyalty} from "./SWR_Hooks.js"
+import {useTokenPolicies, useTokenBalance, useTokenSupply, usePrecision, useRoyalty, clear_sales} from "./SWR_Hooks.js"
 import {useState, useMemo, useEffect} from 'react'
 import {TransactionManager,  WalletAccountManager} from './Transactions';
 import {Card, Grid, Image, Label, Message, Form, Container, Header, Segment, Radio, Modal, Button, Table } from 'semantic-ui-react'
@@ -459,7 +459,7 @@ function SellForm({token_id})
 
             {selectedSale == "AUCTION-SALE" && has_balance && <> <AuctionSellForm onChange={setData} />
                                                                  <AuctionPriceNet sale_data={data} token_id={token_id} fee={fee} /></>}
-          <TransactionManager trx={trx} wallet={userData?.wallet} />
+          <TransactionManager trx={trx} wallet={userData?.wallet} onConfirm={clear_sales}/>
           </Form>
 }
 

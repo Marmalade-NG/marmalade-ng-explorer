@@ -7,7 +7,7 @@ import {auction_next_price} from './marmalade_common'
 import {make_nonce} from './transactions_common';
 import {CopyHeader, Price} from './Common'
 import {TokenCard} from './TokenCards'
-import {useSale, usePrecision, useTokenSupply, useDutchPrice} from "./SWR_Hooks.js"
+import {useSale, usePrecision, useTokenSupply, useDutchPrice, clear_sales} from "./SWR_Hooks.js"
 import {TransactionManager,  WalletAccountManager} from './Transactions';
 
 
@@ -48,7 +48,7 @@ function BuyingForm({sale})
                                     ?make_trx(sale, userData.account, userData.guard):null, [sale?.['sale-id'], userData])
   return  <Form>
             <WalletAccountManager set_data={setUserData} currency={sale.currency} />
-            <TransactionManager trx={transaction} wallet={userData?.wallet} />
+            <TransactionManager trx={transaction} wallet={userData?.wallet} onConfirm={clear_sales}/>
           </Form>
 }
 

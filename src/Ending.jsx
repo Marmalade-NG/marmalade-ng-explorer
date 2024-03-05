@@ -1,4 +1,4 @@
-import {useSale} from "./SWR_Hooks.js"
+import {useSale, clear_sales} from "./SWR_Hooks.js"
 import {useState, useMemo, useEffect} from 'react'
 import {TransactionManager,  WalletAccountManager} from './Transactions';
 import {Grid, Message, Form, Container, Header, Segment } from 'semantic-ui-react'
@@ -79,7 +79,7 @@ function EndingForm({sale, sale_type})
   console.log(transaction)
   return  <Form>
             <WalletAccountManager set_data={setUserData} currency={sale.currency} />
-            <TransactionManager trx={transaction} wallet={userData?.wallet} />
+            <TransactionManager trx={transaction} wallet={userData?.wallet} onConfirm={clear_sales}/>
           </Form>
 }
 
