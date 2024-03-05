@@ -161,7 +161,7 @@ export function useMarketPlace(sale_id)
 
 export function useFixedIssuance(token_id)
 {
-  const {data, error} = useSWR(["/issuance", token_id], x => {return m_client.batch(x)})
+  const {data, error} = useSWRImmutable(["/issuance", token_id], x => {return m_client.batch(x)})
   if(error)
     console.warn(error);
   return {issuance:data, error}
