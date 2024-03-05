@@ -1,7 +1,7 @@
 import {useTokenPolicies, useTokenBalance, useTokenSupply, usePrecision, useRoyalty, clear_sales} from "./SWR_Hooks.js"
 import {useState, useMemo, useEffect} from 'react'
 import {TransactionManager,  WalletAccountManager} from './Transactions';
-import {Card, Grid, Image, Label, Message, Form, Container, Header, Segment, Radio, Modal, Button, Table } from 'semantic-ui-react'
+import {Card, Grid, Image, Label, Message, Form, Container, Header, Segment, Radio, Modal, Button, Table , Popup} from 'semantic-ui-react'
 import {Pact} from '@kadena/client'
 import {m_client} from "./chainweb_marmalade_ng"
 import Decimal from 'decimal.js';
@@ -158,6 +158,7 @@ function NoTimeoutDatePicker({value, onChange, disabled})
   return  <>
             <Form.Field disabled={disabled}>
               <Radio toggle label='Unlimited sale' checked={is_no_timeout} onChange={(e,t) => setNoTimeout(t.checked)} />
+              &nbsp;&nbsp;<Popup content="When choosing an Unlimited sale, tiemout will be disabled. Seller can close the sale at any time."  on='click' trigger={<Button color="teal" basic size="mini" circular icon='help'/>} />
             </Form.Field>
             <Form.Field disabled={is_no_timeout || disabled}>
               <label>End date</label>
