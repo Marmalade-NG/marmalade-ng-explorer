@@ -14,7 +14,7 @@ const DEFAULT_MISSING = {meta:null, thumbnail:MISSING_IMG}
 const THUMBNAIL_MAX_X = 320
 const THUMBNAIL_MAX_Y = 320
 
-const GATEWAY_ROUND_ROBIN = false
+const GATEWAY_ROUND_ROBIN = true
 
 const GATEWAYS = [".dweb.link", "ipfs.io", "cloudflare-ipfs.com", ".cf-ipfs.com", "gateway.pinata.cloud", ".nftstorage.link"];
 
