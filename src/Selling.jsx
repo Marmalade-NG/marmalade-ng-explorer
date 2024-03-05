@@ -17,6 +17,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import SALES_A_IMG from './assets/sales_a.png'
 import SALES_F_IMG from './assets/sales_f.png'
 import SALES_D_IMG from './assets/sales_d.png'
+import DUTCH_SCHEME from './assets/dutch_scheme.png'
 
 const coin_fungible = {refSpec: [{namespace:null, name:"fungible-v2"}],
                        refName: {namespace:null, name: "coin"}}
@@ -309,6 +310,113 @@ function DutchAuctionPriceNet({sale_data, token_id, fee})
   return sale_data? <Message icon="info" header={`You will receive betwenn ${pretty_price(total[1], "coin")} and ${pretty_price(total[0], "coin")}`}  content={details}  />:""
 }
 
+function FixedPriceHelpModal()
+{
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Modal
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      open={open}
+      trigger={<Segment textAlign="center"> <Link>How does it work ?</Link> </Segment>}
+    >
+      <Modal.Header>Fixed price Sale</Modal.Header>
+      <Modal.Content image>
+        <Image size='medium' src={SALES_F_IMG} wrapped />
+        <Modal.Description>
+          The token is put for sale at a fixed price defined by the seller.
+          <br /> <br />
+          This is an instant buy. The sale is settled immediately when a User wants to take the offer at the proposed price.
+          <br /> <br />
+          The sale offer is available until timeout is reached. After the timeout, the sale has to be withdrawn.
+          <br /> <br />
+          In case of an unlimited sale, the seller can withdraw his offer at any time.
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setOpen(false)} positive> Ok </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+function AuctioneHelpModal()
+{
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Modal
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      open={open}
+      trigger={<Segment textAlign="center"> <Link>How does it work ?</Link> </Segment>}
+    >
+      <Modal.Header>Auction Sale</Modal.Header>
+      <Modal.Content image>
+        <Image size='medimum' src={SALES_A_IMG} wrapped />
+        <Modal.Description>
+          The token is put for sale at a starting price defined by the seller.
+          <br /> <br />
+          User can bid for the token.
+          <br />
+          - The first bid has to be made at least at the starting price.
+          <br />
+          - Subsequent bids have to be made at minimum with an increment ratio. eg: at least 120% of the previous bid
+          <br /> <br />
+          This is not an immediate sale. The sale is settled only when the timeout has been reached. Unlimited sale are not supported.
+          <br /> <br />
+          If no bid has been placed when the timeout is reached, the sale is cancelled, and the token is given back to the seller.
+          <br /> <br />
+          The timeout may be slightly extended in case of of a last-minute bid, to discourage people for waiting the last block to bid.
+
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setOpen(false)} positive> Ok </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+
+
+function DutchAuctioneHelpModal()
+{
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Modal
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+      open={open}
+      trigger={<Segment textAlign="center"> <Link>How does it work ?</Link> </Segment>}
+    >
+      <Modal.Header>Dutch Auction Sale</Modal.Header>
+      <Modal.Content image>
+        <Image size='huge' src={DUTCH_SCHEME} wrapped />
+        <Modal.Description>
+          The token is put for sale at a starting price defined by the seller.
+          <br /> <br />
+          The price decreases exponentially toward the "End of slope price". This price will be reached at "End of slope time".
+          <br /> <br />
+          After "End of slope time", the price stops to decrease, and the token can be bought at a fixed price.
+          <br /> <br />
+          This is an instant buy. The sale is settled immediately when a User wants to take the offer at the current price.
+          <br /> <br />
+          The sale offer is available until timeout is reached. After the timeout, the sale has to be withdrawn.
+          <br /> <br />
+          In case of an unlimited sale, the seller can withdraw his offer at any time.
+        </Modal.Description>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button onClick={() => setOpen(false)} positive> Ok </Button>
+      </Modal.Actions>
+    </Modal>
+  )
+}
+
+
 function FixedPriceSellForm({disabled, onChange})
 {
   const [price, _setPrice] = useState(null)
@@ -317,6 +425,7 @@ function FixedPriceSellForm({disabled, onChange})
   const setToDate = x => {_setToDate(x); if(price) {onChange({price:price, tout:x})}}
 
   return  <>
+          <FixedPriceHelpModal />
           <Grid celled>
             <Grid.Row>
               <Grid.Column width={7}>
@@ -349,6 +458,7 @@ function AuctionSellForm({disabled, onChange})
                    },[startingPrice, increment, toDate, onChange])
 
   return  <>
+          <AuctioneHelpModal />
           <Grid celled>
             <Grid.Row>
               <Grid.Column width={7}>
@@ -389,6 +499,7 @@ function DutchAuctionSellForm({disabled, onChange})
                    },[endPrice, startingPrice, endSlopeDate, toDate, onChange])
 
   return  <>
+          <DutchAuctioneHelpModal />
           <Grid celled>
             <Grid.Row>
               <Grid.Column width={7}>
