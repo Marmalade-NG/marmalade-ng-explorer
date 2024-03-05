@@ -165,6 +165,18 @@ class MarmaladeNGClient
                     {cmd: () => `(${this.policy_collection}.get-all-collections)`,
                     post: x =>x,
                     multirows:true},
+                "/allSalesFixed":
+                    {cmd: () => `(${this.policy_fixed_sale}.get-all-active-sales)`,
+                     post: (lst) => lst.map(to_fixed_sale),
+                     multirows:true},
+                "/allSalesAuction":
+                    {cmd: () => `(${this.policy_auction_sale}.get-all-active-sales)`,
+                     post: (lst) => lst.map(to_auction_sale),
+                     multirows:true},
+                "/allSalesDutchAuction":
+                    {cmd: () => `(${this.policy_dutch_auction_sale}.get-all-active-sales)`,
+                     post: (lst) => lst.map(to_dutch_auction_sale),
+                     multirows:true},
                 "/listHolders":
                     {cmd: id => `(${this.ledger}.list-holders "${id}")`,
                      post: x => x.map(to_owned_balance),
@@ -348,23 +360,7 @@ class MarmaladeNGClient
   {
     return this.#client.pollStatus({requestKey:cmd.hash, chainId: this.chain , networkId: this.network},
                                    {timeout:1000*180, interval:5000})
-               .then(x=> x?.[cmd.hash]) 
-  }
-
-  list_sales(account_token)
-  {
-    let func_arg
-    if(!account_token)
-      func_arg = "get-all-active-sales";
-    else if(account_token.startsWith("t:"))
-      func_arg = `get-sales-for-token "${account_token}"`;
-    else
-      func_arg = `get-sales-from-account "${account_token}"`;
-
-    return this.local_pact(`{'f:(${this.policy_fixed_sale}.${func_arg}),
-                             'a:(${this.policy_auction_sale}.${func_arg}),
-                             'd:(${this.policy_dutch_auction_sale}.${func_arg})}`)
-          .then(({f, a, d}) => ({f:f.map(to_fixed_sale), a:a.map(to_auction_sale), d:d.map(to_dutch_auction_sale)}))
+               .then(x=> x?.[cmd.hash])
   }
 
   get_modules_hashes()

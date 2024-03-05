@@ -475,7 +475,7 @@ function Selling({token_id})
             </Segment>
             <Grid celled>
                       <Grid.Column width={4}>
-                        <TokenCard token_id={token_id} />
+                        <TokenCard token_id={token_id} hide_sales={true}  />
 
                       </Grid.Column>
 

@@ -1,5 +1,5 @@
 import {useNFTdata} from "./NFT_data.js"
-import {useTokenUri, useSale, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
+import {useTokenUri, useSale, useSalesForToken, useDutchPrice, useTokenSupply, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {Link} from 'react-router-dom';
 import {Card, Image, Label, Button, Icon, Segment} from 'semantic-ui-react';
 import {Price} from './Common.jsx';
@@ -51,18 +51,33 @@ function DutchAuctionSale({sale_id})
           </div>
 }
 
+function SaleContent({sale})
+{
+  switch(sale.type)
+  {
+    case "f":
+      return <Card.Content extra><FixedSale sale_id={sale["sale-id"]} /></Card.Content>
+    case "d":
+      return <Card.Content extra><DutchAuctionSale sale_id={sale["sale-id"]} /></Card.Content>
+    case "a":
+      return <Card.Content extra><AuctionSale sale_id={sale["sale-id"]} /></Card.Content>
+    default:
+      return ""
+  }
+}
 
-function TokenCard({token_id, balance, sale_type, sale_id, can_sell})
+
+function TokenCard({token_id, balance, sale_id, can_sell, hide_sales})
 {
   const {uri} = useTokenUri(token_id);
   const {data} = useNFTdata(uri);
   const {supply} = useTokenSupply(balance?token_id:null)
   const {policies} = useTokenPolicies(token_id)
-
+  const {sales} = useSalesForToken(token_id);
   const {collection} = useTokenCollection(policies.includes("COLLECTION")?token_id:null);
 
   const img = enabled_image(token_id)?data.thumbnail:REMOVED_IMG;
-
+  const sale_filter = sale_id? ({"sale-id":sid})=>sid==sale_id:()=>true;
 
   return  <Card as={Link} to={"/token/"+token_id} raised style={{width:"250px", padding:"2px"}}>
             <Image src={img} />
@@ -74,11 +89,8 @@ function TokenCard({token_id, balance, sale_type, sale_id, can_sell})
             <Card.Content extra>
               {collection? (<Link to={"/collection/"+collection.c.id} > <Label tag>{collection.c.name}</Label> <Label tag color="teal"># {collection.r.toString()}</Label></Link>):""}
             </Card.Content>
-
-            {sale_type==="f"?(<Card.Content extra><FixedSale sale_id={sale_id} /></Card.Content>):""}
-            {sale_type==="a"?(<Card.Content extra><AuctionSale sale_id={sale_id} /></Card.Content>):""}
-            {sale_type==="d"?(<Card.Content extra><DutchAuctionSale sale_id={sale_id} /></Card.Content>):""}
-            {can_sell && import.meta.env.VITE_SALES_ENABLED == "true" && <SellFixture token_id={token_id} />}
+            {!hide_sales && sales.filter(sale_filter).map( x => <SaleContent key={x["sale-id"]} sale={x} />) }
+            {!hide_sales && can_sell && import.meta.env.VITE_SALES_ENABLED == "true" && <SellFixture token_id={token_id} />}
           </Card>
 }
 

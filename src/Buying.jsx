@@ -148,7 +148,7 @@ function Buying({sale_id, sale_type})
             </Segment>
             {sale && <Grid celled>
                       <Grid.Column width={4}>
-                        <TokenCard token_id={sale['token-id']} />
+                        <TokenCard token_id={sale['token-id']} hide_sales={true} />
                         {sale_type != "a" && <SaleDetails sale={sale} sale_type={sale_type} />}
                         {sale_type == "a" && <AuctionSaleDetails sale={sale} sale_type={sale_type} />}
                       </Grid.Column>

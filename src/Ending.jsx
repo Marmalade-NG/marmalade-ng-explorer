@@ -96,7 +96,7 @@ function Ending({sale_id, sale_type})
             </Segment>
             {sale && <Grid celled>
                       <Grid.Column width={4}>
-                        <TokenCard token_id={sale['token-id']} />
+                        <TokenCard token_id={sale['token-id']} hide_sales={true}  />
                       </Grid.Column>
 
                       <Grid.Column width={8}>
@@ -106,11 +106,5 @@ function Ending({sale_id, sale_type})
                     </Grid>}
         </Container>
 }
-
-/*
-  {sale.enabled && sale_type != "a" && <BuyingForm sale={sale} sale_type={sale_type}/>}
-  {sale.enabled && sale_type == "a" && <BidForm sale={sale} />}
-
-*/
 
 export {Ending}

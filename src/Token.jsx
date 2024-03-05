@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {useSales, useBridgeDest, useBridgeSrc, useTokenBridging, useFixedIssuance, useRoyalty, useGuards, useCustodians, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
+import {useSalesForToken, useBridgeDest, useBridgeSrc, useTokenBridging, useFixedIssuance, useRoyalty, useGuards, useCustodians, useTokenExtraBlacklist, useTokenUri, useTokenExtraPolicies, usePrecision, useDutchPrice, useTokenSupply,useOwners, useTokenPolicies, useTokenCollection} from "./SWR_Hooks.js"
 import {useNFTdata} from "./NFT_data.js"
 import {AccountRef,CopyAccountRef, CopyHeader, CopyLink} from './Common.jsx'
 import {IS_IN, IS_OUT, IN_TYPE, TARGET_IS_NULL, BRIDGE_TYPE, target_type } from './Bridge.js'
@@ -106,9 +106,24 @@ function CommonSaleRow({sale, sale_type})
           </>
 }
 
+function SaleRows({sale, precision})
+{
+  switch(sale.type)
+  {
+    case "f":
+      return <FixedSaleRow prec={precision} sale={sale} />
+    case "d":
+      return <DutchAuctionSaleRow prec={precision} sale={sale} />
+    case "a":
+      return <AuctionSaleRow prec={precision} sale={sale} />
+    default:
+      return <Table.Row><Table.Cell> ?????? </Table.Cell></Table.Row>
+  }
+}
+
 function SalesTable({token_id})
 {
-  const {sales} = useSales(token_id)
+  const {sales} = useSalesForToken(token_id)
   const {precision} = usePrecision(token_id)
 
   return  <Segment raised>
@@ -125,9 +140,7 @@ function SalesTable({token_id})
               </Table.Header>
 
               <Table.Body>
-                {sales.f.map( x => (<FixedSaleRow key={x} prec={precision} sale={x} />))}
-                {sales.a.map( x => (<AuctionSaleRow key={x} prec={precision} sale={x} />))}
-                {sales.d.map( x => (<DutchAuctionSaleRow key={x} prec={precision} sale={x} />))}
+                {sales.map( x=> <SaleRows sale={x} key={x["sale-id"]} precision={precision} />)}
               </Table.Body>
             </Table>
           </Segment>

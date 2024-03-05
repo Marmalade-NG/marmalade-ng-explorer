@@ -190,13 +190,52 @@ export function useDutchPrice(sale_id)
   return {price:data, error}
 }
 
-export function useSales(account)
+export function useAllSales()
 {
-  const {data, error} = useSWR(["/ListSales", account], ([,a]) => {return m_client.list_sales(a)},
-                               {fallbackData:{f:[], a:[], d:[]}, refreshInterval: 180*1000})
-  if(error)
-    console.warn(error);
-  return {sales:data, error}
+    const not_empty = x => x.length>0?x:["NULL"]
+    const {data:data_f, error:error_f} = useSWR(["/allSalesFixed",        undefined], x => {return m_client.batch(x).then(not_empty)}, {refreshInterval:600*1000, dedupingInterval:120*1000})
+    const {data:data_a, error:error_a} = useSWR(["/allSalesAuction",      undefined], x => {return m_client.batch(x).then(not_empty)}, {refreshInterval:600*1000, dedupingInterval:120*1000})
+    const {data:data_d, error:error_d} = useSWR(["/allSalesDutchAuction", undefined], x => {return m_client.batch(x).then(not_empty)}, {refreshInterval:600*1000, dedupingInterval:120*1000})
+
+    const error = error_f?error_f:(error_a?error_a:(error_d?error_d:null));
+
+    if(error)
+      console.warn(error);
+
+    const sales_map = new Map()
+
+    function __append(x)
+    {
+      const {"token-id":tid} = x;
+      const last = sales_map.get(tid);
+      if(last)
+        last.push(x);
+      else if(tid)
+        sales_map.set(tid, [x]);
+    }
+
+    if(data_f)
+      data_f.forEach(__append);
+    if(data_a)
+      data_a.forEach(__append);
+    if(data_d)
+      data_d.forEach(__append);
+
+    return {sales_map, error}
+}
+
+export function useSalesForAccount(account)
+{
+  const {sales_map, error} = useAllSales();
+  const sales = Array.from(sales_map.values()).flat().filter( ({recipient}) => recipient==account);
+  return {sales, error}
+}
+
+export function useSalesForToken(token)
+{
+  const {sales_map, error} = useAllSales();
+  const sales = sales_map.get(token)??[]
+  return {sales, error}
 }
 
 export function useAccountBalances(account)
