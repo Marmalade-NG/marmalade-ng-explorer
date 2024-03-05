@@ -1,7 +1,7 @@
 import {TokenCard} from './TokenCards.jsx'
 import {CopyHeader} from './Common.jsx'
 import {useSalesForAccount, useAccountBalances} from "./SWR_Hooks.js"
-import {Container, Card, Segment} from 'semantic-ui-react'
+import {Container, Card, Segment, Header} from 'semantic-ui-react'
 
 function Account({account})
 {
@@ -10,6 +10,7 @@ function Account({account})
 
   return  <Container>
             <Segment color="purple" stacked compact>
+              <Header as="h1">Account: </Header>
               <CopyHeader>{account}</CopyHeader>
             </Segment>
 

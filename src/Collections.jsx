@@ -2,7 +2,7 @@ import {useState} from 'react'
 import {TokenCard} from './TokenCards.jsx'
 import {CopyHeader, Paginator} from './Common.jsx'
 import {useTokensFromCollection, useCollection} from "./SWR_Hooks.js"
-import {Container, Card, Table, Segment} from 'semantic-ui-react'
+import {Container, Card, Table, Segment, Header} from 'semantic-ui-react'
 import {enabled_token} from './exclude.js'
 import {paginate} from './pagination.js'
 
@@ -20,6 +20,7 @@ function Collection({collection_id})
 
   return  <Container>
             <Segment color="purple" stacked compact>
+              <Header as="h1">Collection: </Header>
               <CopyHeader>{collection_id}</CopyHeader>
               {collection_data?(<Table basic='very' celled collapsing>
                                   <Table.Body>
