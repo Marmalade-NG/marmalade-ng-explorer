@@ -83,7 +83,7 @@ function AccountFromRoute ()
 
 function CollectionFromRoute ()
 {
-  const {collection_ref} = useParams()
+  const {"*":collection_ref} = useParams()
   return <Collection collection_id={collection_ref} />
 }
 
@@ -132,7 +132,7 @@ function App ()
     <Container style={{paddingTop:"100px", paddingBottom:"20px"}}>
       <Routes>
         <Route path="account/:account_ref" element={<AccountFromRoute />} />
-        <Route path="collection/:collection_ref" element={<CollectionFromRoute />} />
+        <Route path="collection/*" element={<CollectionFromRoute />} />
         <Route path="collections" element={<CollectionsList />} />
         <Route path="sales/:sale_type" element={<SalesFromRoute />} />
         <Route path="buy/:sale_type/:sale_id" element={<BuyFromRoute />} />
